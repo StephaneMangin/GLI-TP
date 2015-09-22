@@ -6,9 +6,6 @@ import org.istic.gli.models.IModel;
 import org.istic.gli.models.Model;
 import org.istic.gli.views.CamenbertComponent;
 
-import javax.swing.*;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**

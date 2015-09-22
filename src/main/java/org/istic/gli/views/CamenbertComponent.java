@@ -13,8 +13,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.JComponent;
 
-public class CamenbertComponent extends javax.swing.JComponent implements MouseListener
+public class CamenbertComponent extends JComponent implements MouseListener
 {
 
 	Graphics2D g2d;	
