@@ -3,7 +3,7 @@ package org.istic.gli.models;
 /**
  * Created by lucas on 22/09/15.
  */
-public class Item {
+public class Item implements IItem {
     private String title;
     private String desc;
     private Float value;
