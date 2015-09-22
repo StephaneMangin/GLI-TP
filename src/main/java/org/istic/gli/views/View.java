@@ -12,10 +12,12 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JComponent;
 
-public class CamenbertComponent extends JComponent implements MouseListener
+public class View extends JComponent implements MouseListener, IView
 {
 
 	Graphics2D g2d;	
@@ -24,7 +26,7 @@ public class CamenbertComponent extends JComponent implements MouseListener
 	
 	String mTexte;
 	
-	public CamenbertComponent(IModel im, IController ic) {
+	public View(IModel im, IController ic) {
 		mTexte = new String("Hello");
 		model = im;
 		controller = ic;
@@ -86,7 +88,10 @@ public class CamenbertComponent extends JComponent implements MouseListener
 		// TODO Auto-generated method stub
 		
 	}
-	
-	
-	
+
+
+    @Override
+    public void update(Observable observable, Object o) {
+        // mise à jour du camenbert
+    }
 }
