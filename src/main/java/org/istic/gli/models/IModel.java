@@ -7,7 +7,6 @@ import java.util.List;
  */
 public interface IModel {
 
-    List<IItem> getItems();
     void addItem(IItem item);
     void delItem(IItem item);
 }

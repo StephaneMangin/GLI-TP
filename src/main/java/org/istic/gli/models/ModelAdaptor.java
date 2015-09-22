@@ -1,15 +1,16 @@
-package org.istic.gli.models.adapters;
+package org.istic.gli.models;
 
 import org.istic.gli.models.IItem;
 import org.istic.gli.models.IModel;
 import org.istic.gli.models.Model;
 
+import java.util.List;
 import java.util.Observable;
 
 /**
  * Created by stephane on 22/09/15.
  */
-public class ModelAdaptor extends Observable {
+public class ModelAdaptor extends Observable implements IModel {
 
     private Model model;
 
@@ -19,10 +20,12 @@ public class ModelAdaptor extends Observable {
 
     public void addItem(IItem item) {
         model.addItem(item);
+        notifyObservers();
     }
 
     public void delItem(IItem item) {
         model.delItem(item);
+        notifyObservers();
     }
 
 }
