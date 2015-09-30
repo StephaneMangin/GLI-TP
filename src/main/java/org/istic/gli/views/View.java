@@ -43,15 +43,15 @@ public class View extends JComponent implements MouseListener, IView
 	}
 
 	void drawPie(Graphics2D g, Rectangle area, List<IItem> items) {
-		double total = 0.0D;
+		double total = 0.0;
 		for (IItem item : items) {
 			total += item.getValue();
 		}
-		double curValue = 0.0D;
+		double curValue = 0.0;
 		int startAngle = 0;
 		for (IItem item : items) {
-			startAngle = (int) (curValue * 360 / total);
-			int arcAngle = (int) (item.getValue() * 360 / total);
+			startAngle = (int) Math.round(curValue * 360 / total);
+			int arcAngle = (int) Math.round(item.getValue() * 360 / total);
 			g.setColor(new Color(0, 0, (200/items.size()*items.indexOf(item)) + 50));
 			g.fillArc(area.x, area.y, area.width, area.height,
 					startAngle, arcAngle);
