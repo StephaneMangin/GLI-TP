@@ -56,7 +56,7 @@ public class View extends JComponent implements MouseListener, IView
                     startAngle, arcAngle);
 			curValue += item.getValue();
             g.setColor(new Color(255, 255, 255));
-            g.fillOval(area.x + area.width/4, area.y + area.height/4, area.width/2, area.height/2);
+            g.fillOval(area.x + area.width/3, area.y + area.height/3, area.width/4, area.height/4);
 		}
 	}
 
