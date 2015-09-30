@@ -3,15 +3,12 @@ package org.istic.gli.views;
 import org.istic.gli.controllers.IController;
 import org.istic.gli.models.IItem;
 import org.istic.gli.models.ModelAdaptor;
+import sun.font.DelegatingShape;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,9 +50,9 @@ public class View extends JComponent implements MouseListener, IView
 		for (IItem item : items) {
 			startAngle = (int) Math.round(curValue * 360 / total);
 			int arcAngle = (int) Math.round(item.getValue() * 360 / total);
-			g.setColor(new Color(0, 0, (200/items.size()*items.indexOf(item)) + 50));
+			g.setColor(new Color(0, 0, (200 / items.size() * items.indexOf(item)) + 50));
 			g.fillArc(area.x, area.y, area.width, area.height,
-					startAngle, arcAngle);
+                    startAngle, arcAngle);
 			curValue += item.getValue();
 		}
 	}
@@ -65,7 +62,7 @@ public class View extends JComponent implements MouseListener, IView
 		// TODO Auto-generated method stub
 		
 		// TODO: vérifier si un quartier de camembert a été selectionné 
-		// et renvoyer vers le controlleur 
+		// et renvoyer vers le controlleur
 		mTexte = "Mouse at "+arg0.getX()+"x"+arg0.getY();
 		repaint();
 	}
@@ -98,6 +95,6 @@ public class View extends JComponent implements MouseListener, IView
     @Override
     public void update(Observable observable, Object o) {
         // mise à jour du camenbert
-		paint(this.g);
+        repaint();
     }
 }

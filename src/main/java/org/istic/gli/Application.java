@@ -4,6 +4,7 @@ import au.com.bytecode.opencsv.CSVReader;
 import org.istic.gli.controllers.*;
 import org.istic.gli.models.*;
 import org.istic.gli.views.*;
+import org.istic.gli.views.Frame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,35 +49,11 @@ public class Application {
     }
 
     /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event-dispatching thread.
-     */
-    private static void createAndShowGUI() {
-        //Create and set up the window.
-        frame = new JFrame(title);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        //Add the ubiquitous "Hello World" label.
-        JLabel label = new JLabel(title);
-        frame.getContentPane().add(label);
-
-        // Inject view
-        frame.getContentPane().add(view);
-
-        //Display the window.
-        frame.setMinimumSize(new Dimension(600, 600));
-        frame.setMaximumSize(new Dimension(600, Integer.MAX_VALUE));
-        frame.pack();
-        frame.setVisible(true);
-    }
-
-    /**
      * Main method, used to run the application.
      */
     public static void main(String[] args) throws Exception {
         Application app = new Application();
-        app.createAndShowGUI();
+        frame = new Frame(title, view);
         log.info("Application started");
 
     }
