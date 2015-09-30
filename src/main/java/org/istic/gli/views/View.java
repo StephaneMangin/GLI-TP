@@ -23,7 +23,7 @@ import javax.swing.JComponent;
 public class View extends JComponent implements MouseListener, IView
 {
 
-	Graphics2D g2d;	
+	Graphics g;
 	ModelAdaptor modelAdaptor;
 	IController controller;
 	
@@ -37,12 +37,13 @@ public class View extends JComponent implements MouseListener, IView
 	}
 	
 	public void paint(Graphics g) {
+        this.g = g;
 		super.paintComponent(g);
         List<IItem> items = modelAdaptor.getItems();
-		drawPie((Graphics2D) g, getBounds(), items);
+		drawPie(getBounds(), items);
 	}
 
-	void drawPie(Graphics2D g, Rectangle area, List<IItem> items) {
+	void drawPie(Rectangle area, List<IItem> items) {
 		double total = 0.0;
 		for (IItem item : items) {
 			total += item.getValue();
@@ -97,5 +98,6 @@ public class View extends JComponent implements MouseListener, IView
     @Override
     public void update(Observable observable, Object o) {
         // mise à jour du camenbert
+		paint(this.g);
     }
 }

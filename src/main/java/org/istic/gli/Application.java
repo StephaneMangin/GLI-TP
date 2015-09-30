@@ -6,6 +6,7 @@ import org.istic.gli.models.*;
 import org.istic.gli.views.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.util.logging.Logger;
 
@@ -36,10 +37,13 @@ public class Application {
     }
 
     public Application() throws Exception {
+        // Set the size of the jframe
+        // Manage models and controllers
         Model model = new Model(title);
         createDatas(model);
         ModelAdaptor adaptor = new ModelAdaptor(model);
         IController controller = new Controller(model);
+        // And link with view
         view = new View(adaptor, controller);
     }
 
@@ -61,6 +65,8 @@ public class Application {
         frame.getContentPane().add(view);
 
         //Display the window.
+        frame.setMinimumSize(new Dimension(600, 600));
+        frame.setMaximumSize(new Dimension(600, Integer.MAX_VALUE));
         frame.pack();
         frame.setVisible(true);
     }
