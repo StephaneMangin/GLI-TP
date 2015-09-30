@@ -18,6 +18,22 @@ public class ModelAdaptor extends Observable implements IModel {
         this.model  = model;
     }
 
+    @Override
+    public String getTitle() {
+         return model.getTitle();
+    }
+
+    @Override
+    public void setTitle(String title) {
+        model.setTitle(title);
+        notifyObservers();
+    }
+
+    @Override
+    public List<IItem> getItems() {
+        return model.getItems();
+    }
+
     public void addItem(IItem item) {
         model.addItem(item);
         notifyObservers();

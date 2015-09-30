@@ -27,8 +27,8 @@ public class View extends JComponent implements MouseListener, IView
 	String mTexte;
 	
 	public View(IModel im, IController ic) {
-		mTexte = new String("Hello");
 		model = im;
+		mTexte = model.getTitle();
 		controller = ic;
 		addMouseListener(this);
 	}
