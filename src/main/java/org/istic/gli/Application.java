@@ -4,6 +4,7 @@ import org.istic.gli.controllers.Controller;
 import org.istic.gli.controllers.IController;
 import org.istic.gli.models.IModel;
 import org.istic.gli.models.Model;
+import org.istic.gli.models.ModelAdaptor;
 import org.istic.gli.views.IView;
 import org.istic.gli.views.View;
 
@@ -21,9 +22,10 @@ public class Application {
     private static Logger log = Logger.getLogger("Application");
 
     public Application() {
-        IModel model = new Model(title);
+        Model model = new Model(title);
+        ModelAdaptor adaptor = new ModelAdaptor(model);
         IController controller = new Controller(model);
-        view = new View(model, controller);
+        view = new View(adaptor, controller);
     }
 
     /**

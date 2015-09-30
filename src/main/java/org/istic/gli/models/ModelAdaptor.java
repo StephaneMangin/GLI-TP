@@ -14,7 +14,7 @@ public class ModelAdaptor extends Observable implements IModel {
 
     private Model model;
 
-    ModelAdaptor(Model model) {
+    public ModelAdaptor(Model model) {
         this.model  = model;
     }
 

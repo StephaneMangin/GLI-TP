@@ -2,6 +2,7 @@ package org.istic.gli.views;
 
 import org.istic.gli.controllers.IController;
 import org.istic.gli.models.IModel;
+import org.istic.gli.models.ModelAdaptor;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -21,14 +22,14 @@ public class View extends JComponent implements MouseListener, IView
 {
 
 	Graphics2D g2d;	
-	IModel model;
+	ModelAdaptor modelAdaptor;
 	IController controller;
 	
 	String mTexte;
 	
-	public View(IModel im, IController ic) {
-		model = im;
-		mTexte = model.getTitle();
+	public View(ModelAdaptor im, IController ic) {
+		modelAdaptor = im;
+		mTexte = modelAdaptor.getTitle();
 		controller = ic;
 		addMouseListener(this);
 	}
