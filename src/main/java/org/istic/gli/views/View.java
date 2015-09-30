@@ -8,6 +8,7 @@ import sun.font.DelegatingShape;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -66,37 +67,43 @@ public class View extends JComponent implements MouseListener, IView
 		// TODO: vérifier si un quartier de camembert a été selectionné 
 		// et renvoyer vers le controlleur
 		mTexte = "Mouse at "+arg0.getX()+"x"+arg0.getY();
-		repaint();
+        System.out.println("mouseClicked");
+        repaint();
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+        System.out.println("mouseEntered");
+
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+        System.out.println("mouseExited");
+
 	}
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+        System.out.println("mousePressed");
+
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		
+        System.out.println("mouseReleased");
+
 	}
 
 
     @Override
     public void update(Observable observable, Object o) {
         // mise à jour du camenbert
+        System.out.println("update view");
         repaint();
     }
 }
