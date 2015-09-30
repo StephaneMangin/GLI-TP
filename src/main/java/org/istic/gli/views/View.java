@@ -1,7 +1,7 @@
 package org.istic.gli.views;
 
 import org.istic.gli.controllers.IController;
-import org.istic.gli.models.IModel;
+import org.istic.gli.models.IItem;
 import org.istic.gli.models.ModelAdaptor;
 
 import java.awt.Color;
@@ -13,6 +13,8 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -34,28 +36,29 @@ public class View extends JComponent implements MouseListener, IView
 		addMouseListener(this);
 	}
 	
-	public void paintComponent(Graphics g) {
+	public void paint(Graphics g) {
 		super.paintComponent(g);
-		
-		Dimension d = getSize();
-
-		g2d = (Graphics2D) g;
-
-
-		g2d.setColor(Color.RED);
-		Rectangle2D rect2D = new Rectangle(0+10, 0+10, d.width-10, d.height-10);
-		g2d.fill(rect2D);
-
-
-		g2d.setFont(new Font("Arial", Font.BOLD, 14));
-		g2d.setColor(Color.WHITE);
-		
-		// TODO: utilisation des données du IModel pour l'affichage
-		g2d.drawString( mTexte , 20, 34);
-		
-		
+        List<IItem> items = modelAdaptor.getItems();
+		drawPie((Graphics2D) g, getBounds(), items);
 	}
-	
+
+	void drawPie(Graphics2D g, Rectangle area, List<IItem> items) {
+		double total = 0.0D;
+		for (IItem item : items) {
+			total += item.getValue();
+		}
+		double curValue = 0.0D;
+		int startAngle = 0;
+		for (IItem item : items) {
+			startAngle = (int) (curValue * 360 / total);
+			int arcAngle = (int) (item.getValue() * 360 / total);
+			g.setColor(new Color(0, 0, (200/items.size()*items.indexOf(item)) + 50));
+			g.fillArc(area.x, area.y, area.width, area.height,
+					startAngle, arcAngle);
+			curValue += item.getValue();
+		}
+	}
+
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
