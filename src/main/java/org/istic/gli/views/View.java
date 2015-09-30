@@ -37,7 +37,7 @@ public class View extends JComponent implements MouseListener, IView
 	}
 	
 	public void paint(Graphics g) {
-		super.paintComponent(g);
+		super.paint(g);
         List<IItem> items = modelAdaptor.getItems();
 		drawPie((Graphics2D) g, getBounds(), items);
 	}
