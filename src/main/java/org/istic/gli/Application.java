@@ -2,9 +2,7 @@ package org.istic.gli;
 
 import org.istic.gli.controllers.Controller;
 import org.istic.gli.controllers.IController;
-import org.istic.gli.models.IModel;
-import org.istic.gli.models.Model;
-import org.istic.gli.models.ModelAdaptor;
+import org.istic.gli.models.*;
 import org.istic.gli.views.IView;
 import org.istic.gli.views.View;
 
@@ -23,6 +21,16 @@ public class Application {
 
     public Application() {
         Model model = new Model(title);
+        IItem item1 = new Item();
+        item1.setDesc("test");
+        item1.setTitle("test");
+        item1.setValue(1.0);
+        model.addItem(item1);
+        IItem item2 = new Item();
+        item2.setDesc("test");
+        item2.setTitle("test");
+        item2.setValue(2.0);
+        model.addItem(item2);
         ModelAdaptor adaptor = new ModelAdaptor(model);
         IController controller = new Controller(model);
         view = new View(adaptor, controller);

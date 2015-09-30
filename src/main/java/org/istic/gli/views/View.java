@@ -52,7 +52,7 @@ public class View extends JComponent implements MouseListener, IView
 		for (IItem item : items) {
 			startAngle = (int) (curValue * 360 / total);
 			int arcAngle = (int) (item.getValue() * 360 / total);
-			g.setColor(new Color(192, 123, 123));
+			g.setColor(new Color(0, 0, (200/items.size()*items.indexOf(item)) + 50));
 			g.fillArc(area.x, area.y, area.width, area.height,
 					startAngle, arcAngle);
 			curValue += item.getValue();
