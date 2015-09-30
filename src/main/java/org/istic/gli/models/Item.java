@@ -1,12 +1,14 @@
 package org.istic.gli.models;
 
+import java.util.DoubleSummaryStatistics;
+
 /**
  * Created by lucas on 22/09/15.
  */
 public class Item implements IItem {
     private String title;
     private String desc;
-    private Float value;
+    private Double value;
 
     public String getTitle() {
         return title;
@@ -24,11 +26,11 @@ public class Item implements IItem {
         this.desc = desc;
     }
 
-    public Float getValue() {
+    public Double getValue() {
         return value;
     }
 
-    public void setValue(Float value) {
+    public void setValue(Double value) {
         this.value = value;
     }
 }

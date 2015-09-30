@@ -9,7 +9,7 @@ public interface IItem {
     void setTitle(String title);
     String getDesc();
     void setDesc(String desc);
-    Float getValue();
-    void setValue(Float value);
+    Double getValue();
+    void setValue(Double value);
 
 }

@@ -1,6 +1,7 @@
 package org.istic.gli.models;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ public class Model implements IModel {
 
     private String title;
 
-    private List<IItem> items;
+    private List<IItem> items = new ArrayList<>();
 
     public Model(String title) {
         this.title = title;

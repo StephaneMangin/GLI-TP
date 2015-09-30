@@ -1,14 +1,17 @@
 package org.istic.gli;
 
+import au.com.bytecode.opencsv.CSVReader;
 import org.istic.gli.controllers.Controller;
 import org.istic.gli.controllers.IController;
 import org.istic.gli.models.IModel;
+import org.istic.gli.models.Item;
 import org.istic.gli.models.Model;
 import org.istic.gli.models.ModelAdaptor;
 import org.istic.gli.views.IView;
 import org.istic.gli.views.View;
 
 import javax.swing.*;
+import java.io.*;
 import java.util.logging.Logger;
 
 /**
@@ -21,8 +24,25 @@ public class Application {
     private static String title = "Mon camenbert";
     private static Logger log = Logger.getLogger("Application");
 
-    public Application() {
+    private void createDatas(Model model) throws IOException {
+        File csvFile = new File(getClass().getResource("/datas.csv").getFile());
+        FileReader content = new FileReader(csvFile);
+        CSVReader csvReader = new CSVReader(content, ',', '"', 1);
+
+        String[] line = null;
+        while ((line = csvReader.readNext()) != null) {
+            Item item = new Item();
+            item.setTitle(line[0]);
+            item.setDesc(line[1]);
+            item.setValue(Double.valueOf(line[2]));
+            System.out.println("new item: " +  item.toString());
+            model.addItem(item);
+        }
+    }
+
+    public Application() throws Exception {
         Model model = new Model(title);
+        createDatas(model);
         ModelAdaptor adaptor = new ModelAdaptor(model);
         IController controller = new Controller(model);
         view = new View(adaptor, controller);
@@ -53,7 +73,7 @@ public class Application {
     /**
      * Main method, used to run the application.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Application app = new Application();
         app.createAndShowGUI();
         log.info("Application started");
