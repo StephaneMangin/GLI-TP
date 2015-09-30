@@ -46,6 +46,8 @@ public class Application {
         IController controller = new Controller(model);
         // And link with view
         view = new View(adaptor, controller);
+        frame = new Frame(title, view);
+        frame.setVisible(true);
     }
 
     /**
@@ -53,7 +55,6 @@ public class Application {
      */
     public static void main(String[] args) throws Exception {
         Application app = new Application();
-        frame = new Frame(title, view);
         log.info("Application started");
 
     }

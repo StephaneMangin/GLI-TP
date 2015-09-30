@@ -22,7 +22,6 @@ public class Frame extends JFrame {
         this.setMinimumSize(new Dimension(200, 200));
         this.setSize(600, 600);
         this.pack();
-        this.setVisible(true);
     }
 
 }
