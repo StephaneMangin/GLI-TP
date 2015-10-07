@@ -6,6 +6,7 @@ import org.istic.gli.models.ModelAdaptor;
 import sun.font.DelegatingShape;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
@@ -17,29 +18,41 @@ import java.util.List;
 
 import javax.swing.*;
 
-public class View extends JComponent implements MouseListener, IView
+public class View extends JComponent implements IView
 {
 
-	Graphics g;
 	Graphics2D g2;
 	ModelAdaptor modelAdaptor;
 	IController controller;
 	
-	String mTexte;
-    Collection<Arc2D> sections;
+    Map<Arc2D, IItem> sections;
 	
 	public View(ModelAdaptor im, IController ic) {
 		modelAdaptor = im;
-		mTexte = modelAdaptor.getTitle();
 		controller = ic;
-		addMouseListener(this);
+        this.sections = new HashMap<>();
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                super.mouseClicked(mouseEvent);
+                System.out.println("mouseClicked");
+                int posX = mouseEvent.getX();
+                int posY = mouseEvent.getY();
+                for (Arc2D arc : sections.keySet()) {
+                    if (arc.contains(posX, posY)) {
+                        // TODO increase the radius
+                        IItem item = sections.get(arc);
+                        repaint();
+                    }
+                }
+            }
+        });
+
 	}
 	
 	public void paint(Graphics g) {
-        this.g = g;
+        super.paint(g);
 		this.g2 = (Graphics2D)g;
-        this.sections = new ArrayList<>();
-		super.paint(g);
         List<IItem> items = modelAdaptor.getItems();
 		drawPie(getBounds(), items);
 	}
@@ -62,14 +75,13 @@ public class View extends JComponent implements MouseListener, IView
 			arc.setFrame(area.x + area.width/3.0, area.y+area.height/3.0, area.width/3.0, area.height/3.0);
 			arc.setAngleStart(startAngle);
 			arc.setAngleExtent(arcAngle);
-            sections.add(arc);
+            sections.put(arc, item);
             Color color = new Color(0, 0, (200 / items.size() * items.indexOf(item)) + 50);
             //Tag position
-            drawTag(area, startAngle, arcAngle, area.width/5.0, area.height/15.0, item.getTitle(), color);
+            drawTag(area, startAngle, arcAngle, area.width / 5.0, area.height / 15.0, item.getTitle(), color);
             //Draw the arc with new color:
             g2.setColor(color);
 			g2.fill(arc);
-
 			curValue += item.getValue();
 		}
         //Draw a circle to make a hole in the pie
@@ -97,48 +109,8 @@ public class View extends JComponent implements MouseListener, IView
         g2.setColor(new Color(255, 255, 255));
         Font font = new Font(" Verdana ",Font.BOLD, (int) height/3);
         g2.setFont(font);
-        g2.drawString(title, (float)(tagX + 5), (float)(tagY + height*0.6));
+        g2.drawString(title, (float) (tagX + 5), (float) (tagY + height * 0.6));
     }
-
-	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
-		// TODO: vérifier si un quartier de camembert a été selectionné 
-		// et renvoyer vers le controlleur
-		mTexte = "Mouse at "+arg0.getX()+"x"+arg0.getY();
-        System.out.println("mouseClicked");
-        repaint();
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-        System.out.println("mouseEntered");
-
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-        System.out.println("mouseExited");
-
-	}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-        System.out.println("mousePressed");
-
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-        System.out.println("mouseReleased");
-
-	}
-
 
     @Override
     public void update(Observable observable, Object o) {
