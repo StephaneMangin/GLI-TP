@@ -76,6 +76,9 @@ public class View extends JComponent implements MouseListener, IView
         g2.setColor(new Color(255, 255, 255));
         Ellipse2D.Double cercle = new Ellipse2D.Double(area.x + area.width/5.0*2.0, area.y + area.height/5.0*2.0, area.width/5.0, area.height/5.0);
         g2.fill(cercle);
+        g2.setColor(new Color(55, 55, 50));
+        Ellipse2D.Double cercleData = new Ellipse2D.Double(area.x + area.width/6.0*2.5, area.y + area.height/6.0*2.5, area.width/6.0, area.height/6.0);
+        g2.fill(cercleData);
 	}
 
     private void drawTag(Rectangle area, double startAngle, double arcAngle, double width, double height, String title, Color color) {
