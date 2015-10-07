@@ -9,12 +9,11 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.JComponent;
 
@@ -22,10 +21,12 @@ public class View extends JComponent implements MouseListener, IView
 {
 
 	Graphics g;
+	Graphics2D g2;
 	ModelAdaptor modelAdaptor;
 	IController controller;
 	
 	String mTexte;
+    Collection<Arc2D> sections;
 	
 	public View(ModelAdaptor im, IController ic) {
 		modelAdaptor = im;
@@ -36,29 +37,53 @@ public class View extends JComponent implements MouseListener, IView
 	
 	public void paint(Graphics g) {
         this.g = g;
+		this.g2 = (Graphics2D)g;
+        this.sections = new ArrayList<>();
 		super.paint(g);
         List<IItem> items = modelAdaptor.getItems();
 		drawPie(getBounds(), items);
 	}
 
 	void drawPie(Rectangle area, List<IItem> items) {
-		double total = 0.0;
+        sections.clear();
+        //Process sum of items
+        double total = 0.0;
 		for (IItem item : items) {
 			total += item.getValue();
 		}
+
 		double curValue = 0.0;
-		int startAngle = 0;
+		double startAngle = 0;
 		for (IItem item : items) {
-			startAngle = (int) Math.round(curValue * 360 / total);
-			int arcAngle = (int) Math.round(item.getValue() * 360 / total);
-			g.setColor(new Color(0, 0, (200 / items.size() * items.indexOf(item)) + 50));
-			g.fillArc(area.x, area.y, area.width, area.height,
-                    startAngle, arcAngle);
+			startAngle = Math.round(curValue * 360 / total);
+			double arcAngle = Math.round(item.getValue() * 360 / total);
+
+			Arc2D.Double arc = new Arc2D.Double(Arc2D.PIE);
+			arc.setFrame(area.x + area.width/3.0, area.y+area.height/3.0, area.width/3.0, area.height/3.0);
+			arc.setAngleStart(startAngle);
+			arc.setAngleExtent(arcAngle);
+            sections.add(arc);
+            g2.setColor(new Color(0, 0, (200 / items.size() * items.indexOf(item)) + 50));
+            //Tag position
+            drawTag(area, startAngle, arcAngle);
+            //Draw the arc with new color:
+			g2.fill(arc);
+
 			curValue += item.getValue();
-            g.setColor(new Color(255, 255, 255));
-            g.fillOval(area.x + area.width/3, area.y + area.height/3, area.width/4, area.height/4);
 		}
+        //Draw a circle to make a hole in the pie
+        g2.setColor(new Color(255, 255, 255));
+        Ellipse2D.Double cercle = new Ellipse2D.Double(area.x + area.width/5.0*2.0, area.y + area.height/5.0*2.0, area.width/5.0, area.height/5.0);
+        g2.fill(cercle);
 	}
+
+    private void drawTag(Rectangle area, double startAngle, double arcAngle) {
+        double tagX = area.width/2.0 + (area.width/4.0 * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagY = area.height/2.0 + (area.height/4.0 * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
+        //Placing nearest corner at the right position
+        Rectangle2D.Double tag = new Rectangle2D.Double(tagX, tagY, area.width/8.0, area.width/10.0);
+        g2.fill(tag);
+    }
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
