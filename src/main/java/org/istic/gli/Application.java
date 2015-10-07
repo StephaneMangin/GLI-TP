@@ -1,13 +1,14 @@
 package org.istic.gli;
 
 import au.com.bytecode.opencsv.CSVReader;
+import org.istic.gli.adaptors.ModelAdaptor;
 import org.istic.gli.controllers.*;
+import org.istic.gli.interfaces.IController;
 import org.istic.gli.models.*;
 import org.istic.gli.views.*;
 import org.istic.gli.views.Frame;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.util.logging.Logger;
 

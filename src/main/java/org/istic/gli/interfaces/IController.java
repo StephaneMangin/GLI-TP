@@ -1,4 +1,4 @@
-package org.istic.gli.controllers;
+package org.istic.gli.interfaces;
 
 /**
  * Created by stephane on 22/09/15.

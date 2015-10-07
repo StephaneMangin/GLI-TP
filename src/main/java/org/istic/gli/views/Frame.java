@@ -1,5 +1,7 @@
 package org.istic.gli.views;
 
+import org.istic.gli.interfaces.IView;
+
 import javax.swing.*;
 import java.awt.*;
 

@@ -1,5 +1,7 @@
 package org.istic.gli.models;
 
+import org.istic.gli.interfaces.IItem;
+
 import java.util.DoubleSummaryStatistics;
 
 /**

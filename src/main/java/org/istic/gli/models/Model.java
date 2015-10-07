@@ -1,6 +1,9 @@
 package org.istic.gli.models;
 
 
+import org.istic.gli.interfaces.IItem;
+import org.istic.gli.interfaces.IModel;
+
 import java.util.ArrayList;
 import java.util.List;
 

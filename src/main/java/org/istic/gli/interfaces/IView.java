@@ -1,4 +1,4 @@
-package org.istic.gli.views;
+package org.istic.gli.interfaces;
 
 import java.util.Observer;
 

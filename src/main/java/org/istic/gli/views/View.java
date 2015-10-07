@@ -1,17 +1,15 @@
 package org.istic.gli.views;
 
-import org.istic.gli.controllers.IController;
-import org.istic.gli.models.IItem;
-import org.istic.gli.models.ModelAdaptor;
-import sun.font.DelegatingShape;
+import org.istic.gli.interfaces.IController;
+import org.istic.gli.interfaces.IItem;
+import org.istic.gli.interfaces.IView;
+import org.istic.gli.adaptors.ModelAdaptor;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
@@ -56,37 +54,54 @@ public class View extends JComponent implements IView
         super.paint(g);
 		this.g2 = (Graphics2D)g;
         List<IItem> items = modelAdaptor.getItems();
-		drawPie(getBounds(), items);
+        mapArcToItem(items); // Must be execute first
+		drawPie();
+        drawHole();
 	}
 
-	void drawPie(Rectangle area, List<IItem> items) {
+    private void mapArcToItem(List<IItem> items) {
+        for (IItem item : items) {
+            Arc2D.Double arc = new Arc2D.Double(Arc2D.PIE);
+            sections.put(arc, item);
+        }
+    }
+
+	private void drawPie() {
         // TODO : limit cyclomatic conplexity by splitting method
+        Rectangle area = getBounds();
         sections.clear();
         //Process sum of items
-        double total = 0.0;
-		for (IItem item : items) {
-			total += item.getValue();
-		}
-
+        int total = 0;
+        for (IItem item : sections.values()) {
+            total += item.getValue();
+        }
 		double curValue = 0.0;
-		double startAngle = 0;
-		for (IItem item : items) {
-			startAngle = Math.round(curValue * 360 / total);
-			double arcAngle = Math.round(item.getValue() * 360 / total);
 
-			Arc2D.Double arc = new Arc2D.Double(Arc2D.PIE);
-			arc.setFrame(area.x + area.width/3.0, area.y+area.height/3.0, area.width/3.0, area.height/3.0);
-			arc.setAngleStart(startAngle);
-			arc.setAngleExtent(arcAngle);
-            sections.put(arc, item);
-            Color color = new Color(0, 0, (200 / items.size() * items.indexOf(item)) + 50);
+        int colorHelper = 0;
+        for (Arc2D arc: sections.keySet()) {
+            IItem item = sections.get(arc);
+            double startAngle = Math.round(curValue * 360 / total);
+            double arcAngle = Math.round(item.getValue() * 360 / total);
+            Color color = new Color(0, 0, (200 / sections.size() * colorHelper) + 50);
+
+            arc.setFrame(area.x + area.width/3.0, area.y+area.height/3.0, area.width/3.0, area.height/3.0);
+            arc.setAngleStart(startAngle);
+            arc.setAngleExtent(arcAngle);
+
             //Tag position
             drawTag(area, startAngle, arcAngle, area.width / 5.0, area.height / 15.0, item.getTitle(), color);
+
             //Draw the arc with new color:
             g2.setColor(color);
-			g2.fill(arc);
-			curValue += item.getValue();
-		}
+            g2.fill(arc);
+            curValue += item.getValue();
+            colorHelper++;
+        }
+
+	}
+
+    private void drawHole() {
+        Rectangle area = getBounds();
         //Draw a circle to make a hole in the pie
         g2.setColor(new Color(255, 255, 255));
         Ellipse2D.Double cercle = new Ellipse2D.Double(area.x + area.width/5.0*2.0, area.y + area.height/5.0*2.0, area.width/5.0, area.height/5.0);
@@ -94,7 +109,7 @@ public class View extends JComponent implements IView
         g2.setColor(new Color(55, 55, 50));
         Ellipse2D.Double cercleData = new Ellipse2D.Double(area.x + area.width/6.0*2.5, area.y + area.height/6.0*2.5, area.width/6.0, area.height/6.0);
         g2.fill(cercleData);
-	}
+    }
 
     private void drawTag(Rectangle area, double startAngle, double arcAngle, double width, double height, String title, Color color) {
         double tagX = area.width/2.0 + (area.width/5.0 * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));

@@ -1,6 +1,7 @@
 package org.istic.gli.controllers;
 
-import org.istic.gli.models.IModel;
+import org.istic.gli.interfaces.IController;
+import org.istic.gli.interfaces.IModel;
 
 /**
  * Created by stephane on 22/09/15.
