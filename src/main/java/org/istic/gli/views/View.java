@@ -15,7 +15,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.List;
 
-import javax.swing.JComponent;
+import javax.swing.*;
 
 public class View extends JComponent implements MouseListener, IView
 {
@@ -63,10 +63,11 @@ public class View extends JComponent implements MouseListener, IView
 			arc.setAngleStart(startAngle);
 			arc.setAngleExtent(arcAngle);
             sections.add(arc);
-            g2.setColor(new Color(0, 0, (200 / items.size() * items.indexOf(item)) + 50));
+            Color color = new Color(0, 0, (200 / items.size() * items.indexOf(item)) + 50);
             //Tag position
-            drawTag(area, startAngle, arcAngle);
+            drawTag(area, startAngle, arcAngle, area.width/5.0, area.height/15.0, item.getTitle(), color);
             //Draw the arc with new color:
+            g2.setColor(color);
 			g2.fill(arc);
 
 			curValue += item.getValue();
@@ -77,12 +78,26 @@ public class View extends JComponent implements MouseListener, IView
         g2.fill(cercle);
 	}
 
-    private void drawTag(Rectangle area, double startAngle, double arcAngle) {
-        double tagX = area.width/2.0 + (area.width/4.0 * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
-        double tagY = area.height/2.0 + (area.height/4.0 * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
+    private void drawTag(Rectangle area, double startAngle, double arcAngle, double width, double height, String title, Color color) {
+        double tagX = area.width/2.0 + (area.width/5.0 * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagY = area.height/2.0 + (area.height/5.0 * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
         //Placing nearest corner at the right position
-        Rectangle2D.Double tag = new Rectangle2D.Double(tagX, tagY, area.width/8.0, area.width/10.0);
+        if(tagX > area.width/2.0 && tagY < area.height/2.0) {
+            tagY = tagY - height;
+        } else if (tagX < area.width/2.0 && tagY > area.height/2.0) {
+            tagX = tagX - width;
+        } else if (tagX < area.width/2.0 && tagY < area.height/2.0) {
+            tagX = tagX - width;
+            tagY = tagY - height;
+        }
+
+        Rectangle2D.Double tag = new Rectangle2D.Double(tagX, tagY, width, height);
+        g2.setColor(color);
         g2.fill(tag);
+        g2.setColor(new Color(255, 255, 255));
+        Font font = new Font(" Verdana ",Font.BOLD, (int) height/3);
+        g2.setFont(font);
+        g2.drawString(title, (float)(tagX + 5), (float)(tagY + height*0.6));
     }
 
 	@Override
