@@ -40,7 +40,9 @@ public class View extends JComponent implements IView
                 int posY = mouseEvent.getY();
                 for (Arc2D arc : sections.keySet()) {
                     if (arc.contains(posX, posY)) {
-                        // TODO increase the radius
+                        // TODO : increase the radius
+                        // TODO : Save item in controller
+                        // TODO : screen it
                         IItem item = sections.get(arc);
                         repaint();
                     }
@@ -58,6 +60,7 @@ public class View extends JComponent implements IView
 	}
 
 	void drawPie(Rectangle area, List<IItem> items) {
+        // TODO : limit cyclomatic conplexity by splitting method
         sections.clear();
         //Process sum of items
         double total = 0.0;
