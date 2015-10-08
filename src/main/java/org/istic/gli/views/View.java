@@ -43,6 +43,7 @@ public class View extends JComponent implements IView
                         // TODO : Save item in controller
                         // TODO : screen it
                         IItem item = sections.get(arc);
+                        controller.setCurrentItem(item);
                         repaint();
                     }
                 }
@@ -73,15 +74,31 @@ public class View extends JComponent implements IView
             double startAngle = Math.round(curValue * 360 / total);
             double arcAngle = Math.round(item.getValue() * 360 / total);
             Arc2D.Double arc = new Arc2D.Double(Arc2D.PIE);
-            Color color = new Color(0, 0, (200 / items.size() * items.indexOf(item)) + 50);
-
-            arc.setFrame(area.x + area.width / 3.0, area.y + area.height / 3.0, area.width / 3.0, area.height / 3.0);
+            Color color = new Color(
+                    (50 * items.size() * items.indexOf(item)) % 255,
+                    (150 * items.size() * items.indexOf(item)) % 255,
+                    (200 * items.size() * items.indexOf(item)) % 255);
+            double ratioX = 3.0;
+            double ratioY = 3.0;
+            double ratioW = 3.0;
+            double ratioH = 3.0;
+            double ratioWT = 5.0;
+            double ratioHT = 15.0;
+            if (item.equals(controller.getCurrentItem())) {
+                ratioX = 4.0;
+                ratioY = 4.0;
+                ratioW = 2.0;
+                ratioH = 2.0;
+                ratioWT = 5.0;
+                ratioHT = 15.0;
+            }
+            arc.setFrame(area.x + area.width / ratioX, area.y + area.height / ratioY, area.width / ratioW, area.height / ratioH);
             arc.setAngleStart(startAngle);
             arc.setAngleExtent(arcAngle);
             sections.put(arc, item);
 
             //Tag position
-            drawTag(area, startAngle, arcAngle, area.width / 5.0, area.height / 15.0, item.getTitle(), color);
+            drawTag(area, startAngle, arcAngle, area.width / ratioWT, area.height / ratioHT, item.getTitle(), color);
 
             //Draw the arc with new color:
             g2.setColor(color);
@@ -118,7 +135,7 @@ public class View extends JComponent implements IView
         g2.setColor(color);
         g2.fill(tag);
         g2.setColor(new Color(255, 255, 255));
-        Font font = new Font(" Verdana ",Font.BOLD, (int) height/3);
+        Font font = new Font(" Verdana ",Font.BOLD, (int) height/5);
         g2.setFont(font);
         g2.drawString(title, (float) (tagX + 5), (float) (tagY + height * 0.6));
     }

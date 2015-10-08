@@ -6,4 +6,6 @@ package org.istic.gli.interfaces;
 public interface IController {
 
 
+    IItem getCurrentItem();
+    void setCurrentItem(IItem item);
 }
