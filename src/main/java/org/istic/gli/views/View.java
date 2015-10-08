@@ -22,6 +22,7 @@ public class View extends JComponent implements IView
 	Graphics2D g2;
 	ModelAdaptor modelAdaptor;
 	IController controller;
+    Rectangle area;
 	
     Map<Arc2D, IItem> sections;
 	
@@ -52,41 +53,32 @@ public class View extends JComponent implements IView
 	
 	public void paint(Graphics g) {
         super.paint(g);
+        area = getBounds();
 		this.g2 = (Graphics2D)g;
         List<IItem> items = modelAdaptor.getItems();
-        mapArcToItem(items); // Must be execute first
-		drawPie();
+		drawPie(items);
         drawHole();
 	}
 
-    private void mapArcToItem(List<IItem> items) {
-        for (IItem item : items) {
-            Arc2D.Double arc = new Arc2D.Double(Arc2D.PIE);
-            sections.put(arc, item);
-        }
-    }
-
-	private void drawPie() {
+	private void drawPie(List<IItem> items) {
         // TODO : limit cyclomatic conplexity by splitting method
-        Rectangle area = getBounds();
         sections.clear();
         //Process sum of items
         int total = 0;
-        for (IItem item : sections.values()) {
+        for (IItem item : items) {
             total += item.getValue();
         }
 		double curValue = 0.0;
-
-        int colorHelper = 0;
-        for (Arc2D arc: sections.keySet()) {
-            IItem item = sections.get(arc);
+        for (IItem item : items) {
             double startAngle = Math.round(curValue * 360 / total);
             double arcAngle = Math.round(item.getValue() * 360 / total);
-            Color color = new Color(0, 0, (200 / sections.size() * colorHelper) + 50);
+            Arc2D.Double arc = new Arc2D.Double(Arc2D.PIE);
+            Color color = new Color(0, 0, (200 / items.size() * items.indexOf(item)) + 50);
 
-            arc.setFrame(area.x + area.width/3.0, area.y+area.height/3.0, area.width/3.0, area.height/3.0);
+            arc.setFrame(area.x + area.width / 3.0, area.y + area.height / 3.0, area.width / 3.0, area.height / 3.0);
             arc.setAngleStart(startAngle);
             arc.setAngleExtent(arcAngle);
+            sections.put(arc, item);
 
             //Tag position
             drawTag(area, startAngle, arcAngle, area.width / 5.0, area.height / 15.0, item.getTitle(), color);
@@ -95,13 +87,11 @@ public class View extends JComponent implements IView
             g2.setColor(color);
             g2.fill(arc);
             curValue += item.getValue();
-            colorHelper++;
         }
 
 	}
 
     private void drawHole() {
-        Rectangle area = getBounds();
         //Draw a circle to make a hole in the pie
         g2.setColor(new Color(255, 255, 255));
         Ellipse2D.Double cercle = new Ellipse2D.Double(area.x + area.width/5.0*2.0, area.y + area.height/5.0*2.0, area.width/5.0, area.height/5.0);
