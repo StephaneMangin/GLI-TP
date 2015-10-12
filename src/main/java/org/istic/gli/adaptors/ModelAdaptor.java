@@ -12,9 +12,9 @@ import java.util.Observable;
  */
 public class ModelAdaptor extends Observable implements IModel {
 
-    private Model model;
+    private IModel model;
 
-    public ModelAdaptor(Model model) {
+    public ModelAdaptor(IModel model) {
         this.model  = model;
     }
 

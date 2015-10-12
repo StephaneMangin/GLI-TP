@@ -44,10 +44,11 @@ public class Application {
         Model model = new Model(title);
         createDatas(model);
         ModelAdaptor adaptor = new ModelAdaptor(model);
-        IController controller = new Controller(model);
+        Controller controller = new Controller(adaptor);
         // And link with view
-        view = new View(adaptor, controller);
+        view = new View(controller);
         frame = new Frame(title, view);
+        frame.setSize(650, 650);
         frame.setVisible(true);
     }
 

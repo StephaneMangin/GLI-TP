@@ -1,9 +1,9 @@
 package org.istic.gli.views;
 
+import org.istic.gli.controllers.Controller;
 import org.istic.gli.interfaces.IController;
 import org.istic.gli.interfaces.IItem;
 import org.istic.gli.interfaces.IView;
-import org.istic.gli.adaptors.ModelAdaptor;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -16,20 +16,20 @@ import java.util.List;
 
 import javax.swing.*;
 
-public class View extends JComponent implements IView
-{
+public class View extends JComponent implements IView {
 
 	Graphics2D g2;
-	ModelAdaptor modelAdaptor;
-	IController controller;
+	Controller controller;
     Rectangle area;
 	
     Map<Arc2D, IItem> sections;
-	
-	public View(ModelAdaptor im, IController ic) {
-		modelAdaptor = im;
+    List<IItem> items;
+
+	public View(Controller ic) {
 		controller = ic;
+        controller.addObserver(this);
         this.sections = new HashMap<>();
+        this.items = controller.getItems(); // First initialization, next by update
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
@@ -37,41 +37,40 @@ public class View extends JComponent implements IView
                 System.out.println("mouseClicked");
                 int posX = mouseEvent.getX();
                 int posY = mouseEvent.getY();
+                boolean found = false;
                 for (Arc2D arc : sections.keySet()) {
                     if (arc.contains(posX, posY)) {
+                        found = true;
                         // TODO : increase the radius
                         // TODO : Save item in controller
                         // TODO : screen it
                         IItem item = sections.get(arc);
                         controller.setCurrentItem(item);
-                        repaint();
+                        break;
                     }
+                }
+                if (!found) {
+                    controller.setCurrentItem(null);
                 }
             }
         });
-
 	}
 	
 	public void paint(Graphics g) {
         super.paint(g);
         area = getBounds();
 		this.g2 = (Graphics2D)g;
-        List<IItem> items = modelAdaptor.getItems();
-		drawPie(items);
+        drawPie();
         drawHole();
 	}
 
-	private void drawPie(List<IItem> items) {
+	private void drawPie() {
         // TODO : limit cyclomatic conplexity by splitting method
         sections.clear();
-        //Process sum of items
-        int total = 0;
+        int total = getTotal();
+		double nextStartAngle = 0.0;
         for (IItem item : items) {
-            total += item.getValue();
-        }
-		double curValue = 0.0;
-        for (IItem item : items) {
-            double startAngle = Math.round(curValue * 360 / total);
+            double startAngle = Math.round(nextStartAngle * 360 / total);
             double arcAngle = Math.round(item.getValue() * 360 / total);
             Arc2D.Double arc = new Arc2D.Double(Arc2D.PIE);
             Color color = new Color(
@@ -85,17 +84,16 @@ public class View extends JComponent implements IView
             double ratioWT = 5.0;
             double ratioHT = 15.0;
             if (item.equals(controller.getCurrentItem())) {
-                ratioX = 4.0;
-                ratioY = 4.0;
-                ratioW = 2.0;
-                ratioH = 2.0;
+                ratioX = 3.4;
+                ratioY = 3.5;
+                ratioW = 2.5;
+                ratioH = 2.34;
                 ratioWT = 5.0;
                 ratioHT = 15.0;
             }
             arc.setFrame(area.x + area.width / ratioX, area.y + area.height / ratioY, area.width / ratioW, area.height / ratioH);
             arc.setAngleStart(startAngle);
             arc.setAngleExtent(arcAngle);
-            sections.put(arc, item);
 
             //Tag position
             drawTag(area, startAngle, arcAngle, area.width / ratioWT, area.height / ratioHT, item.getTitle(), color);
@@ -103,10 +101,19 @@ public class View extends JComponent implements IView
             //Draw the arc with new color:
             g2.setColor(color);
             g2.fill(arc);
-            curValue += item.getValue();
+            sections.put(arc, item); // Keep an eye on association to allow mouse event listening
+            nextStartAngle += item.getValue();
         }
 
 	}
+
+    private int getTotal() {
+        int total = 0;
+        for (IItem item : items) {
+            total += item.getValue();
+        }
+        return total;
+    }
 
     private void drawHole() {
         //Draw a circle to make a hole in the pie
@@ -144,6 +151,9 @@ public class View extends JComponent implements IView
     public void update(Observable observable, Object o) {
         // mise à jour du camenbert
         System.out.println("update view");
+        if (observable instanceof IController) {
+            items = ((IController) observable).getItems();
+        }
         repaint();
     }
 }
