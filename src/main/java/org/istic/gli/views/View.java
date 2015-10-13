@@ -84,18 +84,17 @@ public class View extends JComponent implements IView
                     (50 * items.size() * items.indexOf(item)) % 255,
                     (150 * items.size() * items.indexOf(item)) % 255,
                     (200 * items.size() * items.indexOf(item)) % 255);
-            double currentWidth = width / 2;
-            double currentHeight = height / 2;
+            double currentWidth = width / 2.5;
+            double currentHeight = height / 2.5;
+            List<Double> position = getTagPosition(startAngle, arcAngle, width / 4, height / 20);
+            drawTag(position, width / 4, height / 20, item.getTitle(), color);
             // If selected, increase slightly the radius
             if (item.equals(controller.getCurrentItem())) {
-                currentWidth = width / 1.8;
-                currentHeight = height / 1.8;
+                currentWidth = width / 2.3;
+                currentHeight = height / 2.3;
                 //Tag position
-                List<Double> position = getTagPosition(startAngle, arcAngle, width / 5, height / 15);
-                drawTag(position, width / 5, height / 15, item.getTitle(), item.getDesc(), color);
-            } else {
-                List<Double> position = getTagPosition(startAngle, arcAngle, width / 5, height / 20);
-                drawTag(position, width / 5, height / 20, item.getTitle(), null, color);
+                position.set(1, position.get(1) + height / 21);
+                drawTag(position, width / 4, height / 20, item.getDesc(), color);
             }
             double x = (width - currentWidth) / 2;
             double y = (height - currentHeight) / 2;
@@ -134,8 +133,8 @@ public class View extends JComponent implements IView
     private List<Double> getTagPosition(double startAngle, double arcAngle, double width, double height) {
         List<Double> result = new ArrayList<>();
         Rectangle area = getBounds();
-        double tagX = area.width/2.0 + (area.width/3.0 * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
-        double tagY = area.height/2.0 + (area.height/3.0 * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagX = area.width/2.0 + (area.width/4.0 * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagY = area.height/2.0 + (area.height/4.0 * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
         //Placing nearest corner at the right position
         if(tagX > area.width/2.0 && tagY < area.height/2.0) {
             tagY = tagY - height;
@@ -150,24 +149,17 @@ public class View extends JComponent implements IView
         return result;
     }
 
-    private void drawTag(List<Double> position, double width, double height, String title, String content, Color color) {
+    private void drawTag(List<Double> position, double width, double height, String title, Color color) {
         double tagX = position.get(0);
         double tagY = position.get(1);
         Rectangle2D.Double tag = new Rectangle2D.Double();
-        if (content != null) {
-            tag.setFrame(tagX, tagY, width*1.2, height*1.5);
-        } else {
-            tag.setFrame(tagX, tagY, width, height);
-        }
+        tag.setFrame(tagX, tagY, width, height);
         g2.setColor(color);
         g2.fill(tag);
         g2.setColor(new Color(255, 255, 255));
-        Font font = new Font(" Verdana ",Font.BOLD, 10);
+        Font font = new Font(" Verdana ",Font.BOLD, 9);
         g2.setFont(font);
-        g2.drawString(title, (float) (tagX + 1), (float) (tagY + height * 0.6));
-        if (content != null) {
-            g2.drawString(String.format(content), (float) (tagX + 4), (float) (tagY + height * 0.8));
-        }
+        g2.drawString(String.format(title), (float) (tagX + 1), (float) (tagY + height * 0.6));
     }
 
     @Override
