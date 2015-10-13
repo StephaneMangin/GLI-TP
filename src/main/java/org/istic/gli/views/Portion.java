@@ -56,14 +56,18 @@ public class Portion extends JComponent implements IPortion, Observer {
     }
 
     @Override
+    public double getWideAngle() {
+        return Math.round(value * camenbert.getWidenessType().getValue() / camenbert.getWideness());
+    }
+
+    @Override
     public void update(Observable o, Object arg) {
 
     }
 
     void reconfigure() {
         double wideNess = camenbert.getWidenessType().getValue();
-        double startAngle = Math.round(camenbert.getWideness() * wideNess / camenbert.getWideness());
-        double arcAngle = Math.round(portion.getValue() * wideNess / camenbert.getWideness());
+        double startAngle = camenbert.getNextStartAngle();
 
         double ratioX = 3.0;
         double ratioY = 3.0;
@@ -71,7 +75,7 @@ public class Portion extends JComponent implements IPortion, Observer {
         double ratioH = 3.0;
         double ratioWT = 5.0;
         double ratioHT = 15.0;
-        if (item.equals(controller.getCurrentItem())) {
+        if (this.equals(camenbert.getCurrentPortion())) {
             ratioX = 4.0;
             ratioY = 4.0;
             ratioW = 2.0;
@@ -81,6 +85,6 @@ public class Portion extends JComponent implements IPortion, Observer {
         }
         arc.setFrame(area.x + area.width / ratioX, area.y + area.height / ratioY, area.width / ratioW, area.height / ratioH);
         arc.setAngleStart(startAngle);
-        arc.setAnglExtent(arcAngle);
+        arc.setAngleExtent(getWideAngle());
     }
 }

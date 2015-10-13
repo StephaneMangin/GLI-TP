@@ -4,9 +4,7 @@ import org.istic.gli.enums.WideType;
 import org.istic.gli.interfaces.ICamenbert;
 import org.istic.gli.interfaces.IPortion;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.util.List;
 import java.util.Observable;
@@ -23,6 +21,7 @@ public class Camenbert extends Observable implements ICamenbert {
     private double width;
     private double height;
     private Boolean hole = true;
+    private IPortion currentPortion;
 
     public Camenbert(Rectangle surface, Graphics2D g, WideType type) {
         this.surface = surface;
@@ -83,7 +82,27 @@ public class Camenbert extends Observable implements ICamenbert {
         this.hole = value;
     }
 
+    @Override
+    public double getNextStartAngle() {
+        double next = 0;
+        for (IPortion portion: portions) {
+           next += Math.round(portion.getValue() * widenessType.getValue() / getWideness());
+        }
+        return next;
+    }
+
+    @Override
+    public IPortion getCurrentPortion() {
+        return this.currentPortion;
+    }
+
+    @Override
+    public void setCurrentPortion(IPortion portion) {
+        this.currentPortion = portion;
+    }
+
     public void reconfigure() {
+
         if (this.hole) {
             drawHole();
         }

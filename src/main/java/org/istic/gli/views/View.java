@@ -40,13 +40,12 @@ public class View extends JComponent implements IView
                 System.out.println("mouseClicked");
                 int posX = mouseEvent.getX();
                 int posY = mouseEvent.getY();
-                for (Arc2D arc : sections.keySet()) {
-                    if (arc.contains(posX, posY)) {
+                for (Portion portion: camenbert.getPortions()) {
+                    if (portion.contains(posX, posY)) {
                         // TODO : increase the radius
                         // TODO : Save item in controller
                         // TODO : screen it
-                        IItem item = sections.get(arc);
-                        controller.setCurrentItem(item);
+                        camenbert.setCurrentPortion(portion);
                         repaint();
                     }
                 }

@@ -14,5 +14,6 @@ public interface IPortion extends Observer {
     void setActive();
     void setInactive();
     void setColor(Color color);
+    double getWideAngle();
 
 }
