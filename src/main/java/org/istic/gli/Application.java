@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 public class Application {
 
     private static View view;
-    private static JFrame frame;
     private static String title = "Mon camenbert";
     private static Logger log = Logger.getLogger("Application");
 
@@ -46,9 +45,7 @@ public class Application {
         ModelAdaptor adaptor = new ModelAdaptor(model);
         IController controller = new Controller(model);
         // And link with view
-        view = new View(adaptor, controller);
-        frame = new Frame(title, view);
-        frame.setVisible(true);
+        view = new View(adaptor, controller, 600, 600);
     }
 
     /**

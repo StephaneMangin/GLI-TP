@@ -19,17 +19,17 @@ import javax.swing.*;
 public class View extends JComponent implements IView
 {
 
-	Graphics2D g2;
-	ModelAdaptor modelAdaptor;
-	IController controller;
-    Rectangle area;
-	
+    private JFrame frame;
+	private Graphics2D g2;
+	private ModelAdaptor modelAdaptor;
+	private IController controller;
+
     Map<Arc2D, IItem> sections;
 	
-	public View(ModelAdaptor im, IController ic) {
+	public View(ModelAdaptor im, IController ic, int width, int height) {
 		modelAdaptor = im;
 		controller = ic;
-        this.sections = new HashMap<>();
+        sections = new HashMap<>();
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
@@ -49,16 +49,19 @@ public class View extends JComponent implements IView
                 }
             }
         });
-
+        frame = new Frame(modelAdaptor.getTitle(), this);
+        frame.setSize(width, height);
+        frame.setVisible(true);
 	}
 	
 	public void paint(Graphics g) {
         super.paint(g);
-        area = getBounds();
 		this.g2 = (Graphics2D)g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+                RenderingHints.VALUE_ANTIALIAS_ON);
         List<IItem> items = modelAdaptor.getItems();
 		drawPie(items);
-        drawHole();
+        drawHole(5.0, 1.3);
 	}
 
 	private void drawPie(List<IItem> items) {
@@ -70,35 +73,34 @@ public class View extends JComponent implements IView
             total += item.getValue();
         }
 		double curValue = 0.0;
+        double width = getBounds().getWidth();
+        double height = getBounds().getHeight();
         for (IItem item : items) {
-            double startAngle = Math.round(curValue * 360 / total);
-            double arcAngle = Math.round(item.getValue() * 360 / total);
+            double startAngle = (curValue * 360 / total) - 1;
+            double arcAngle = (item.getValue() * 360 / total) - 1;
             Arc2D.Double arc = new Arc2D.Double(Arc2D.PIE);
             Color color = new Color(
                     (50 * items.size() * items.indexOf(item)) % 255,
                     (150 * items.size() * items.indexOf(item)) % 255,
                     (200 * items.size() * items.indexOf(item)) % 255);
-            double ratioX = 3.0;
-            double ratioY = 3.0;
-            double ratioW = 3.0;
-            double ratioH = 3.0;
-            double ratioWT = 5.0;
-            double ratioHT = 15.0;
+            double currentWidth = width / 2;
+            double currentHeight = height / 2;
+            // If selected, increase slightly the radius
+            List<Double> position = getTagPosition(startAngle, arcAngle, width / 5, height / 15);
             if (item.equals(controller.getCurrentItem())) {
-                ratioX = 4.0;
-                ratioY = 4.0;
-                ratioW = 2.0;
-                ratioH = 2.0;
-                ratioWT = 5.0;
-                ratioHT = 15.0;
+                currentWidth = width / 1.8;
+                currentHeight = height / 1.8;
+                //Tag position
+                drawTag(position, width / 5, height / 10, item.getTitle(), item.getDesc(), color);
+            } else {
+                drawTag(position, width / 6, height / 20, item.getTitle(), null, color);
             }
-            arc.setFrame(area.x + area.width / ratioX, area.y + area.height / ratioY, area.width / ratioW, area.height / ratioH);
+            double x = (width - currentWidth) / 2;
+            double y = (height - currentHeight) / 2;
+            arc.setFrame(x, y, currentWidth, currentHeight);
             arc.setAngleStart(startAngle);
             arc.setAngleExtent(arcAngle);
             sections.put(arc, item);
-
-            //Tag position
-            drawTag(area, startAngle, arcAngle, area.width / ratioWT, area.height / ratioHT, item.getTitle(), color);
 
             //Draw the arc with new color:
             g2.setColor(color);
@@ -108,19 +110,30 @@ public class View extends JComponent implements IView
 
 	}
 
-    private void drawHole() {
+    private void drawHole(double proportion, double inside) {
+        double width = getBounds().getWidth();
+        double height = getBounds().getHeight();
+        double propWidth = width/proportion;
+        double propHeight = height/proportion;
         //Draw a circle to make a hole in the pie
+
         g2.setColor(new Color(255, 255, 255));
-        Ellipse2D.Double cercle = new Ellipse2D.Double(area.x + area.width/5.0*2.0, area.y + area.height/5.0*2.0, area.width/5.0, area.height/5.0);
+        Ellipse2D.Double cercle = new Ellipse2D.Double((width - propWidth) / 2, (height - propHeight) / 2, propWidth, propHeight);
         g2.fill(cercle);
-        g2.setColor(new Color(55, 55, 50));
-        Ellipse2D.Double cercleData = new Ellipse2D.Double(area.x + area.width/6.0*2.5, area.y + area.height/6.0*2.5, area.width/6.0, area.height/6.0);
-        g2.fill(cercleData);
+        if (inside != 0.0) {
+            propWidth = width/proportion/inside;
+            propHeight = height/proportion/inside;
+            g2.setColor(new Color(55, 55, 50));
+            Ellipse2D.Double cercleData = new Ellipse2D.Double((width - propWidth) / 2, (height - propHeight) / 2, propWidth, propHeight);
+            g2.fill(cercleData);
+        }
     }
 
-    private void drawTag(Rectangle area, double startAngle, double arcAngle, double width, double height, String title, Color color) {
-        double tagX = area.width/2.0 + (area.width/5.0 * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
-        double tagY = area.height/2.0 + (area.height/5.0 * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
+    private List<Double> getTagPosition(double startAngle, double arcAngle, double width, double height) {
+        List<Double> result = new ArrayList<>();
+        Rectangle area = getBounds();
+        double tagX = area.width/2.0 + (area.width/3.0 * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagY = area.height/2.0 + (area.height/3.0 * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
         //Placing nearest corner at the right position
         if(tagX > area.width/2.0 && tagY < area.height/2.0) {
             tagY = tagY - height;
@@ -130,14 +143,26 @@ public class View extends JComponent implements IView
             tagX = tagX - width;
             tagY = tagY - height;
         }
+        result.add(tagX);
+        result.add(tagY);
+        return result;
+    }
 
-        Rectangle2D.Double tag = new Rectangle2D.Double(tagX, tagY, width, height);
+    private void drawTag(List<Double> position, double width, double height, String title, String content, Color color) {
+        double tagX = position.get(0);
+        double tagY = position.get(1);
+        Rectangle2D.Double tag = new Rectangle2D.Double();
+        tag.setFrame(tagX, tagY, width, height);
         g2.setColor(color);
         g2.fill(tag);
         g2.setColor(new Color(255, 255, 255));
-        Font font = new Font(" Verdana ",Font.BOLD, (int) height/5);
+        Font font = new Font(" Verdana ",Font.BOLD, 10);
         g2.setFont(font);
-        g2.drawString(title, (float) (tagX + 5), (float) (tagY + height * 0.6));
+        g2.drawString(title, (float) (tagX + 2), (float) (tagY + height * 0.6));
+        if (content != null) {
+            tag.setFrame(tagX, tagY, width*2, height*3);
+            g2.drawString(content, (float) (tagX + 3), (float) (tagY + height));
+        }
     }
 
     @Override
