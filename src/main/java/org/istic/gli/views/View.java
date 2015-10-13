@@ -52,6 +52,7 @@ public class View extends JComponent implements IView
         frame = new Frame(modelAdaptor.getTitle(), this);
         frame.setSize(width, height);
         frame.setVisible(true);
+        frame.setResizable(false);
 	}
 	
 	public void paint(Graphics g) {
@@ -86,14 +87,15 @@ public class View extends JComponent implements IView
             double currentWidth = width / 2;
             double currentHeight = height / 2;
             // If selected, increase slightly the radius
-            List<Double> position = getTagPosition(startAngle, arcAngle, width / 5, height / 15);
             if (item.equals(controller.getCurrentItem())) {
                 currentWidth = width / 1.8;
                 currentHeight = height / 1.8;
                 //Tag position
-                drawTag(position, width / 5, height / 10, item.getTitle(), item.getDesc(), color);
+                List<Double> position = getTagPosition(startAngle, arcAngle, width / 5, height / 15);
+                drawTag(position, width / 5, height / 15, item.getTitle(), item.getDesc(), color);
             } else {
-                drawTag(position, width / 6, height / 20, item.getTitle(), null, color);
+                List<Double> position = getTagPosition(startAngle, arcAngle, width / 5, height / 20);
+                drawTag(position, width / 5, height / 20, item.getTitle(), null, color);
             }
             double x = (width - currentWidth) / 2;
             double y = (height - currentHeight) / 2;
@@ -152,16 +154,19 @@ public class View extends JComponent implements IView
         double tagX = position.get(0);
         double tagY = position.get(1);
         Rectangle2D.Double tag = new Rectangle2D.Double();
-        tag.setFrame(tagX, tagY, width, height);
+        if (content != null) {
+            tag.setFrame(tagX, tagY, width*1.2, height*1.5);
+        } else {
+            tag.setFrame(tagX, tagY, width, height);
+        }
         g2.setColor(color);
         g2.fill(tag);
         g2.setColor(new Color(255, 255, 255));
         Font font = new Font(" Verdana ",Font.BOLD, 10);
         g2.setFont(font);
-        g2.drawString(title, (float) (tagX + 2), (float) (tagY + height * 0.6));
+        g2.drawString(title, (float) (tagX + 1), (float) (tagY + height * 0.6));
         if (content != null) {
-            tag.setFrame(tagX, tagY, width*2, height*3);
-            g2.drawString(content, (float) (tagX + 3), (float) (tagY + height));
+            g2.drawString(String.format(content), (float) (tagX + 4), (float) (tagY + height * 0.8));
         }
     }
 
