@@ -1,4 +1,4 @@
-package org.istic.gli.interfaces;
+package org.istic.gli.interfaces.view;
 
 import java.awt.*;
 import java.util.Observable;
@@ -11,9 +11,6 @@ public interface IPortion extends Observer {
 
     void setValue(double value);
     double getValue();
-    void setActive();
-    void setInactive();
     void setColor(Color color);
-    double getWideAngle();
-
+    Color getColor();
 }

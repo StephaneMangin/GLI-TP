@@ -1,8 +1,8 @@
 package org.istic.gli.controllers;
 
-import org.istic.gli.interfaces.IController;
-import org.istic.gli.interfaces.IItem;
-import org.istic.gli.interfaces.IModel;
+import org.istic.gli.interfaces.controller.IController;
+import org.istic.gli.interfaces.model.IItem;
+import org.istic.gli.interfaces.model.IModel;
 
 /**
  * Created by stephane on 22/09/15.

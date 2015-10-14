@@ -1,80 +1,74 @@
 package org.istic.gli.views;
 
 import org.istic.gli.enums.WideType;
-import org.istic.gli.interfaces.ICamenbert;
-import org.istic.gli.interfaces.IPortion;
+import org.istic.gli.interfaces.view.ICamenbert;
+import org.istic.gli.interfaces.view.IPortion;
 
 import java.awt.*;
+import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
-import java.util.List;
-import java.util.Observable;
+import java.awt.geom.Point2D;
+import java.util.*;
 
 /**
  * Created by smangin on 08/10/15.
  */
 public class Camenbert extends Observable implements ICamenbert {
 
-    private Rectangle surface;
-    private Graphics2D g2d;
-    private WideType widenessType = WideType.Degree;
-    private List<IPortion> portions;
+    private WideType wideType = WideType.Degree;
+    private Map<IPortion, Arc2D> portions;
     private double width;
     private double height;
     private Boolean hole = true;
     private IPortion currentPortion;
 
-    public Camenbert(Rectangle surface, Graphics2D g, WideType type) {
-        this.surface = surface;
-        this.g2d = g;
-        this.widenessType = type;
+    public Camenbert(WideType type) {
+        this.wideType = type;
+        this.portions = new HashMap<>();
     }
 
     @Override
-    public void setWidenessType(WideType type) {
-        this.widenessType = type;
+    public void setWideType(WideType type) {
+        this.wideType = type;
     }
 
     @Override
     public void addPortion(double value) {
-        IPortion portion = new Portion(this, value);
+        IPortion portion = new Portion(value);
         this.addObserver(portion);
+        Arc2D arc = new Arc2D.Double(Arc2D.PIE);
         Color color = new Color(
                 (50 * (int) Math.random()) % 255,
                 (150 * (int) Math.random()) % 255,
                 (200 * (int) Math.random()) % 255);
         portion.setColor(color);
-        this.portions.add(portion);
-
-        //Tag position
-        //drawTag(area, startAngle, arcAngle, area.width / ratioWT, area.height / ratioHT, item.getTitle(), color);
-
-        //Draw the arc with new color:
+        System.out.println("Add portion " + portion.getValue());
+        double ratioX = 3.0;
+        double ratioY = 3.0;
+        double ratioW = 3.0;
+        double ratioH = 3.0;
+        arc.setFrame(width / ratioX, height / ratioY, width / ratioW, height / ratioH);
+        this.portions.put(portion, arc);
     }
 
     @Override
     public double getWideness() {
-        return this.widenessType.getValue();
+        double total = 0;
+        for (IPortion portion: portions.keySet()) {
+            total += portion.getValue();
+        }
+        return total;
     }
 
     @Override
-    public WideType getWidenessType() {
-        return widenessType;
+    public WideType getWideType() {
+        return wideType;
     }
 
     @Override
     public void setSize(double width, double height) {
         this.width = width;
         this.height = height;
-    }
-
-    private void drawHole() {
-        //Draw a circle to make a hole in the pie
-        g2d.setColor(new Color(255, 255, 255));
-        Ellipse2D.Double cercle = new Ellipse2D.Double(surface.x + surface.width/5.0*2.0, surface.y + surface.height/5.0*2.0, surface.width/5.0, surface.height/5.0);
-        g2d.fill(cercle);
-        g2d.setColor(new Color(55, 55, 50));
-        Ellipse2D.Double cercleData = new Ellipse2D.Double(surface.x + surface.width/6.0*2.5, surface.y + surface.height/6.0*2.5, surface.width/6.0, surface.height/6.0);
-        g2d.fill(cercleData);
     }
 
     @Override
@@ -85,8 +79,8 @@ public class Camenbert extends Observable implements ICamenbert {
     @Override
     public double getNextStartAngle() {
         double next = 0;
-        for (IPortion portion: portions) {
-           next += Math.round(portion.getValue() * widenessType.getValue() / getWideness());
+        for (IPortion portion: portions.keySet()) {
+           next += Math.round(portion.getValue() * wideType.getValue() / getWideness());
         }
         return next;
     }
@@ -98,18 +92,59 @@ public class Camenbert extends Observable implements ICamenbert {
 
     @Override
     public void setCurrentPortion(IPortion portion) {
+        unselectPortion();
+        double ratioX = 4.0;
+        double ratioY = 4.0;
+        double ratioW = 2.0;
+        double ratioH = 2.0;
+        portions.get(portion).setFrame(width / ratioX, height / ratioY, width / ratioW, height / ratioH);
         this.currentPortion = portion;
     }
 
-    public void reconfigure() {
+    private void unselectPortion(){
+        if (currentPortion != null) {
+            double ratioX = 3.0;
+            double ratioY = 3.0;
+            double ratioW = 3.0;
+            double ratioH = 3.0;
+            portions.get(currentPortion).setFrame(width / ratioX, height / ratioY, width / ratioW, height / ratioH);
+        }
+    }
 
+    @Override
+    public Set<IPortion> getPortions() {
+        return portions.keySet();
+    }
+
+    @Override
+    public boolean hasPosition(IPortion portion, Point2D point) {
+        return portions.get(portion).contains(point);
+    }
+
+    public void configure(View view) {
+        width = view.getWidth();
+        height = view.getHeight();
+        for (IPortion portion: portions.keySet()) {
+            Arc2D arc = portions.get(portion);
+            System.out.println("Configure portion " + portion.getValue());
+            double arcAngle = Math.round(portion.getValue() * getWideType().getValue() / getWideness());
+            arc.setAngleStart(getNextStartAngle());
+            arc.setAngleExtent(arcAngle);
+            view.getG2d().setColor(portion.getColor());
+            view.getG2d().fill(arc);
+        }
         if (this.hole) {
-            drawHole();
+            //Draw a circle to make a hole in the pie
+            view.getG2d().setColor(new Color(255, 255, 255));
+            Ellipse2D.Double cercle = new Ellipse2D.Double(width/5.0*2.0, height/5.0*2.0, width/5.0, height/5.0);
+            view.getG2d().fill(cercle);
+            view.getG2d().setColor(new Color(55, 55, 50));
+            Ellipse2D.Double cercleData = new Ellipse2D.Double(width/6.0*2.5, height/6.0*2.5, width/6.0, height/6.0);
+            view.getG2d().fill(cercleData);
         }
     }
 
     @Override
     public void update(Observable o, Object arg) {
-
     }
 }

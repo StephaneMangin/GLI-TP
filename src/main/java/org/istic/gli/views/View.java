@@ -1,47 +1,46 @@
 package org.istic.gli.views;
 
 import org.istic.gli.enums.WideType;
-import org.istic.gli.interfaces.ICamenbert;
-import org.istic.gli.interfaces.IController;
-import org.istic.gli.interfaces.IItem;
-import org.istic.gli.interfaces.IView;
+import org.istic.gli.interfaces.view.ICamenbert;
+import org.istic.gli.interfaces.controller.IController;
+import org.istic.gli.interfaces.model.IItem;
+import org.istic.gli.interfaces.view.IPortion;
+import org.istic.gli.interfaces.view.IView;
 import org.istic.gli.adaptors.ModelAdaptor;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Rectangle2D;
 import java.util.*;
-import java.util.List;
 
 import javax.swing.*;
 
 public class View extends JComponent implements IView
 {
 
-	Graphics2D g2;
 	ModelAdaptor modelAdaptor;
 	IController controller;
     ICamenbert camenbert;
-    Rectangle area;
-	
-    Map<Arc2D, IItem> sections;
-	
-	public View(ModelAdaptor im, IController ic) {
+    Map<Portion, IItem> sections;
+    private Graphics2D g2d;
+
+    public View(ModelAdaptor im, IController ic) {
 		modelAdaptor = im;
 		controller = ic;
         this.sections = new HashMap<>();
+        camenbert = new Camenbert(WideType.Degree);
+        for (IItem item: modelAdaptor.getItems()) {
+            System.out.println("Add new portion" + item.getValue());
+            camenbert.addPortion(item.getValue());
+        }
+        camenbert.setHole(true);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
                 super.mouseClicked(mouseEvent);
                 System.out.println("mouseClicked");
-                int posX = mouseEvent.getX();
-                int posY = mouseEvent.getY();
-                for (Portion portion: camenbert.getPortions()) {
-                    if (portion.contains(posX, posY)) {
+                for (IPortion portion : camenbert.getPortions()) {
+                    if (camenbert.hasPosition(portion, mouseEvent.getPoint())) {
                         // TODO : increase the radius
                         // TODO : Save item in controller
                         // TODO : screen it
@@ -51,16 +50,12 @@ public class View extends JComponent implements IView
                 }
             }
         });
-
 	}
 	
 	public void paint(Graphics g) {
         super.paint(g);
-        area = getBounds();
-		this.g2 = (Graphics2D)g;
-        camenbert = new Camenbert(area, g2, WideType.Degree);
-        camenbert.setSize(area.x + area.width, area.y + area.height);
-        List<IItem> items = modelAdaptor.getItems();
+        this.g2d = (Graphics2D)g;
+        camenbert.configure(this);
 	}
 
     @Override
@@ -68,5 +63,9 @@ public class View extends JComponent implements IView
         // mise à jour du camenbert
         System.out.println("update view");
         repaint();
+    }
+
+    public Graphics2D getG2d() {
+        return g2d;
     }
 }

@@ -1,4 +1,4 @@
-package org.istic.gli.interfaces;
+package org.istic.gli.interfaces.model;
 
 import java.util.List;
 

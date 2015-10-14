@@ -1,7 +1,7 @@
 package org.istic.gli.adaptors;
 
-import org.istic.gli.interfaces.IItem;
-import org.istic.gli.interfaces.IModel;
+import org.istic.gli.interfaces.model.IItem;
+import org.istic.gli.interfaces.model.IModel;
 import org.istic.gli.models.Model;
 
 import java.util.List;
