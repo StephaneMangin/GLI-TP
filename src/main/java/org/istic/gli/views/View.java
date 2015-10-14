@@ -91,7 +91,7 @@ public class View extends JComponent implements IView
             double currentWidth = width / 2.5;
             double currentHeight = height / 2.5;
             List<Double> position = getTagPosition(startAngle, arcAngle, width / 4, height / 20);
-            drawTag(position, width / 4, height / 20, item.getTitle(), color);
+            drawTag(position, width / 4, height / 20, item.getTitle() + " " + item.getValue() + " €", color);
             // If selected, increase slightly the radius
             if (item.equals(controller.getCurrentItem())) {
                 currentWidth = width / 2.3;
