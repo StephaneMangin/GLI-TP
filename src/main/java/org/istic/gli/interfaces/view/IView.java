@@ -8,4 +8,6 @@ import java.util.Observer;
  */
 public interface IView extends Observer {
     Graphics2D getG2d();
+    int getWidth();
+    int getHeight();
 }

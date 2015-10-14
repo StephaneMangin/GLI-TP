@@ -3,6 +3,7 @@ package org.istic.gli.views;
 import org.istic.gli.enums.WideType;
 import org.istic.gli.interfaces.view.ICamenbert;
 import org.istic.gli.interfaces.view.IPortion;
+import org.istic.gli.interfaces.view.IView;
 
 import java.awt.*;
 import java.awt.geom.Arc2D;
@@ -121,27 +122,36 @@ public class Camenbert extends Observable implements ICamenbert {
         return portions.get(portion).contains(point);
     }
 
-    public void configure(View view) {
-        width = view.getWidth();
-        height = view.getHeight();
+    public void fillInto(IView view) {
         for (IPortion portion: portions.keySet()) {
-            Arc2D arc = portions.get(portion);
-            System.out.println("Configure portion " + portion.getValue());
-            double arcAngle = Math.round(portion.getValue() * getWideType().getValue() / getWideness());
-            arc.setAngleStart(getNextStartAngle());
-            arc.setAngleExtent(arcAngle);
-            view.getG2d().setColor(portion.getColor());
-            view.getG2d().fill(arc);
+            drawArc(portion, view);
         }
         if (this.hole) {
             //Draw a circle to make a hole in the pie
-            view.getG2d().setColor(new Color(255, 255, 255));
-            Ellipse2D.Double cercle = new Ellipse2D.Double(width/5.0*2.0, height/5.0*2.0, width/5.0, height/5.0);
-            view.getG2d().fill(cercle);
-            view.getG2d().setColor(new Color(55, 55, 50));
-            Ellipse2D.Double cercleData = new Ellipse2D.Double(width/6.0*2.5, height/6.0*2.5, width/6.0, height/6.0);
-            view.getG2d().fill(cercleData);
+            drawHole(view);
         }
+    }
+
+    private void drawArc(IPortion portion, IView view) {
+        width = view.getWidth();
+        height = view.getHeight();
+        Arc2D arc = portions.get(portion);
+        System.out.println("Configure portion " + portion.getValue());
+        double arcAngle = Math.round(portion.getValue() * getWideType().getValue() / getWideness());
+        arc.setAngleStart(getNextStartAngle());
+        arc.setAngleExtent(arcAngle);
+        view.getG2d().setColor(portion.getColor());
+        view.getG2d().fill(arc);
+
+    }
+
+    private void drawHole(IView view) {
+        view.getG2d().setColor(new Color(255, 255, 255));
+        Ellipse2D.Double cercle = new Ellipse2D.Double(width/5.0*2.0, height/5.0*2.0, width/5.0, height/5.0);
+        view.getG2d().fill(cercle);
+        view.getG2d().setColor(new Color(55, 55, 50));
+        Ellipse2D.Double cercleData = new Ellipse2D.Double(width/6.0*2.5, height/6.0*2.5, width/6.0, height/6.0);
+        view.getG2d().fill(cercleData);
     }
 
     @Override

@@ -25,5 +25,5 @@ public interface ICamenbert extends Observer {
     void setCurrentPortion(IPortion portion);
     Set<IPortion> getPortions();
     boolean hasPosition(IPortion portion, Point2D point);
-    void configure(View view);
+    void fillInto(IView view);
 }

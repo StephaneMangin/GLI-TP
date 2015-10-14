@@ -18,13 +18,14 @@ import javax.swing.*;
 public class View extends JComponent implements IView
 {
 
-	ModelAdaptor modelAdaptor;
-	IController controller;
-    ICamenbert camenbert;
-    Map<Portion, IItem> sections;
+	private ModelAdaptor modelAdaptor;
+	private IController controller;
+    private ICamenbert camenbert;
+    private Map<Portion, IItem> sections;
     private Graphics2D g2d;
 
     public View(ModelAdaptor im, IController ic) {
+        super();
 		modelAdaptor = im;
 		controller = ic;
         this.sections = new HashMap<>();
@@ -51,21 +52,32 @@ public class View extends JComponent implements IView
             }
         });
 	}
-	
+
+    @Override
 	public void paint(Graphics g) {
         super.paint(g);
         this.g2d = (Graphics2D)g;
-        camenbert.configure(this);
+        camenbert.fillInto(this);
 	}
 
     @Override
     public void update(Observable observable, Object o) {
-        // mise à jour du camenbert
         System.out.println("update view");
         repaint();
     }
 
+    @Override
     public Graphics2D getG2d() {
         return g2d;
+    }
+
+    @Override
+    public int getWidth() {
+        return super.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return super.getHeight();
     }
 }
