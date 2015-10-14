@@ -9,12 +9,14 @@ import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by smangin on 08/10/15.
  */
-public class Camenbert extends Observable implements ICamenbert {
+public class Camenbert implements ICamenbert {
 
     private WideType wideType = WideType.Degree;
     private Map<IPortion, Arc2D> portions;
@@ -22,6 +24,7 @@ public class Camenbert extends Observable implements ICamenbert {
     private double height;
     private Boolean hole = true;
     private IPortion currentPortion;
+    private double currentStartAngle = 0;
 
     public Camenbert(WideType type) {
         this.wideType = type;
@@ -34,22 +37,17 @@ public class Camenbert extends Observable implements ICamenbert {
     }
 
     @Override
-    public void addPortion(double value) {
-        IPortion portion = new Portion(value);
-        this.addObserver(portion);
+    public void addPortion(double value, String title, String content) {
+        IPortion portion = new Portion(value, title, content);
         Arc2D arc = new Arc2D.Double(Arc2D.PIE);
         Color color = new Color(
-                (50 * (int) Math.random()) % 255,
-                (150 * (int) Math.random()) % 255,
-                (200 * (int) Math.random()) % 255);
+                (portions.size() * 200) % 255,
+                (portions.size() * 150) % 255,
+                (portions.size() * 100) % 255);
         portion.setColor(color);
-        System.out.println("Add portion " + portion.getValue());
-        double ratioX = 3.0;
-        double ratioY = 3.0;
-        double ratioW = 3.0;
-        double ratioH = 3.0;
-        arc.setFrame(width / ratioX, height / ratioY, width / ratioW, height / ratioH);
+        System.out.println("Add new portion " + portion.getValue());
         this.portions.put(portion, arc);
+        System.out.println("New total " + getWideness());
     }
 
     @Override
@@ -78,38 +76,13 @@ public class Camenbert extends Observable implements ICamenbert {
     }
 
     @Override
-    public double getNextStartAngle() {
-        double next = 0;
-        for (IPortion portion: portions.keySet()) {
-           next += Math.round(portion.getValue() * wideType.getValue() / getWideness());
-        }
-        return next;
-    }
-
-    @Override
     public IPortion getCurrentPortion() {
         return this.currentPortion;
     }
 
     @Override
     public void setCurrentPortion(IPortion portion) {
-        unselectPortion();
-        double ratioX = 4.0;
-        double ratioY = 4.0;
-        double ratioW = 2.0;
-        double ratioH = 2.0;
-        portions.get(portion).setFrame(width / ratioX, height / ratioY, width / ratioW, height / ratioH);
         this.currentPortion = portion;
-    }
-
-    private void unselectPortion(){
-        if (currentPortion != null) {
-            double ratioX = 3.0;
-            double ratioY = 3.0;
-            double ratioW = 3.0;
-            double ratioH = 3.0;
-            portions.get(currentPortion).setFrame(width / ratioX, height / ratioY, width / ratioW, height / ratioH);
-        }
     }
 
     @Override
@@ -123,8 +96,11 @@ public class Camenbert extends Observable implements ICamenbert {
     }
 
     public void fillInto(IView view) {
+        currentStartAngle = 0;
+        width = view.getWidth();
+        height = view.getHeight();
         for (IPortion portion: portions.keySet()) {
-            drawArc(portion, view);
+            Arc2D arc = drawArc(portion, view.getG2d());
         }
         if (this.hole) {
             //Draw a circle to make a hole in the pie
@@ -132,17 +108,76 @@ public class Camenbert extends Observable implements ICamenbert {
         }
     }
 
-    private void drawArc(IPortion portion, IView view) {
-        width = view.getWidth();
-        height = view.getHeight();
+    private List<Double> getTagPosition(double startAngle, double arcAngle, double ratio) {
+        List<Double> result = new ArrayList<>();
+        double tagX = width/ratio + (width/(ratio) * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagY = height/ratio + (height/(ratio) * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
+        //Placing nearest corner at the right position
+        if(tagX > width/ratio && tagY < height/ratio) {
+            tagY = tagY - width / ratio;
+        } else if (tagX < width/ratio && tagY > height/ratio) {
+            tagX = tagX - width / ratio;
+        } else if (tagX < width/ratio && tagY < height/ratio) {
+            tagX = tagX - width / ratio;
+            tagY = tagY - height / ratio;
+        }
+        result.add(tagX);
+        result.add(tagY);
+        return result;
+    }
+
+    private Arc2D drawArc(IPortion portion, Graphics2D view) {
         Arc2D arc = portions.get(portion);
         System.out.println("Configure portion " + portion.getValue());
         double arcAngle = Math.round(portion.getValue() * getWideType().getValue() / getWideness());
-        arc.setAngleStart(getNextStartAngle());
+        double ratio = 2;
+        if (portion == currentPortion) {
+            ratio = 1.9;
+        }
+        arc.setFrame(
+                (width - width / ratio) / 2,
+                (height - height / ratio) / 2,
+                width / ratio,
+                height / ratio
+        );
         arc.setAngleExtent(arcAngle);
-        view.getG2d().setColor(portion.getColor());
-        view.getG2d().fill(arc);
+        arc.setAngleStart(currentStartAngle);
+        currentStartAngle += arcAngle;
+        view.setColor(portion.getColor());
+        view.fill(arc);
+        drawTitle(portion, view, arc, ratio);
+        if (portion == currentPortion) {
+            drawTag(portion, view, arc, ratio);
+        }
+        return arc;
+    }
 
+    private void drawTitle(IPortion portion, Graphics2D view, Arc2D arc, double ratio) {
+        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent(), ratio);
+        double tagX = position.get(0);
+        double tagY = position.get(1);
+        Rectangle2D.Double tag = new Rectangle2D.Double();
+        tag.setFrame(tagX, tagY, width / 3 / ratio, height / 6 / ratio);
+        view.setColor(portion.getColor());
+        view.fill(tag);
+        view.setColor(new Color(255, 255, 255));
+        Font font = new Font(" Verdana ",Font.BOLD, 9);
+        view.setFont(font);
+        view.drawString(portion.getTitle() + " " + Double.toString(portion.getValue()) + " €", (float) tagX, (float) tagY);
+    }
+
+    private void drawTag(IPortion portion, Graphics2D view, Arc2D arc, double ratio) {
+        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent(), ratio);
+        double tagX = position.get(0);
+        double tagY = position.get(1);
+        Rectangle2D.Double tag = new Rectangle2D.Double();
+        tag.setFrame(tagX, tagY, width / 3 / ratio, height / 6 / ratio);
+        view.setColor(portion.getColor());
+        view.fill(tag);
+        view.setColor(new Color(255, 255, 255));
+        Font font = new Font(" Verdana ",Font.BOLD, 9);
+        view.setFont(font);
+        view.drawString(String.format(portion.getContent()), (float)tagX, (float)tagY);
     }
 
     private void drawHole(IView view) {

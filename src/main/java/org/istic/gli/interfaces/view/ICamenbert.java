@@ -15,12 +15,11 @@ import java.util.Set;
 public interface ICamenbert extends Observer {
 
     void setWideType(WideType type);
-    void addPortion(double value);
+    void addPortion(double value, String title, String content);
     double getWideness();
     WideType getWideType();
     void setSize(double width, double height);
     void setHole(Boolean value);
-    double getNextStartAngle();
     IPortion getCurrentPortion();
     void setCurrentPortion(IPortion portion);
     Set<IPortion> getPortions();

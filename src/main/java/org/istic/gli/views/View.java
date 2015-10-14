@@ -31,8 +31,7 @@ public class View extends JComponent implements IView
         this.sections = new HashMap<>();
         camenbert = new Camenbert(WideType.Degree);
         for (IItem item: modelAdaptor.getItems()) {
-            System.out.println("Add new portion" + item.getValue());
-            camenbert.addPortion(item.getValue());
+            camenbert.addPortion(item.getValue(), item.getTitle(), item.getDesc());
         }
         camenbert.setHole(true);
         addMouseListener(new MouseAdapter() {
@@ -57,6 +56,8 @@ public class View extends JComponent implements IView
 	public void paint(Graphics g) {
         super.paint(g);
         this.g2d = (Graphics2D)g;
+        this.g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+                RenderingHints.VALUE_ANTIALIAS_ON);
         camenbert.fillInto(this);
 	}
 

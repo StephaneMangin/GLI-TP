@@ -12,15 +12,18 @@ import java.util.Observer;
 /**
  * Created by smangin on 08/10/15.
  */
-public class Portion extends JComponent implements IPortion, Observer {
+public class Portion extends JComponent implements IPortion {
 
     private Graphics2D g2d;
     private double value;
     private boolean active;
     private Color color;
+    private String title;
+    private String content;
 
-    public Portion(double value) {
+    public Portion(double value, String title, String content) {
         setValue(value);
+        setContent(title, content);
     }
 
     @Override
@@ -34,6 +37,22 @@ public class Portion extends JComponent implements IPortion, Observer {
     }
 
     @Override
+    public void setContent(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public String getContent() {
+        return content;
+    }
+
+    @Override
     public void setColor(Color color) {
         this.color = color;
     }
@@ -43,11 +62,4 @@ public class Portion extends JComponent implements IPortion, Observer {
         return color;
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-
-    }
-
-    void reconfigure() {
-    }
 }
