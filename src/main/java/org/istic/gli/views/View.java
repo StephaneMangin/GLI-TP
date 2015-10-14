@@ -42,7 +42,7 @@ public class View extends JComponent implements IView
                 int posX = mouseEvent.getX();
                 int posY = mouseEvent.getY();
                 for (Section section : sections.keySet()) {
-                    if (section.getArc().contains(posX, posY)) {
+                    if (section.getArc().contains(posX, posY) || section.getTag().contains(posX, posY)) {
                         // TODO : increase the radius
                         // TODO : Save item in controller
                         // TODO : screen it
