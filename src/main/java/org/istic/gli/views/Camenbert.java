@@ -25,10 +25,14 @@ public class Camenbert implements ICamenbert {
     private Boolean hole = true;
     private IPortion currentPortion;
     private double currentStartAngle = 0;
+    private double ratioMin = 2.0;
+    private double ratioMax = 1.8;
 
-    public Camenbert(WideType type) {
+    public Camenbert(WideType type, double ratioMin, double ratioMax) {
         this.wideType = type;
         this.portions = new HashMap<>();
+        this.ratioMin = ratioMin;
+        this.ratioMax = ratioMax;
     }
 
     @Override
@@ -104,22 +108,22 @@ public class Camenbert implements ICamenbert {
         }
         if (this.hole) {
             //Draw a circle to make a hole in the pie
-            drawHole(view);
+            drawHole(view.getG2d());
         }
     }
 
-    private List<Double> getTagPosition(double startAngle, double arcAngle, double ratio) {
+    private List<Double> getTagPosition(double startAngle, double arcAngle) {
         List<Double> result = new ArrayList<>();
-        double tagX = width/ratio + (width/(ratio) * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
-        double tagY = height/ratio + (height/(ratio) * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagX = width/ratioMin + (width/(ratioMin) * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagY = height/ratioMin + (height/(ratioMin) * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
         //Placing nearest corner at the right position
-        if(tagX > width/ratio && tagY < height/ratio) {
-            tagY = tagY - width / ratio;
-        } else if (tagX < width/ratio && tagY > height/ratio) {
-            tagX = tagX - width / ratio;
-        } else if (tagX < width/ratio && tagY < height/ratio) {
-            tagX = tagX - width / ratio;
-            tagY = tagY - height / ratio;
+        if(tagX > width/ratioMin && tagY < height/ratioMin) {
+            tagY = tagY - width / ratioMin;
+        } else if (tagX < width/ratioMin && tagY > height/ratioMin) {
+            tagX = tagX - width / ratioMin;
+        } else if (tagX < width/ratioMin && tagY < height/ratioMin) {
+            tagX = tagX - width / ratioMin;
+            tagY = tagY - height / ratioMin;
         }
         result.add(tagX);
         result.add(tagY);
@@ -130,9 +134,9 @@ public class Camenbert implements ICamenbert {
         Arc2D arc = portions.get(portion);
         System.out.println("Configure portion " + portion.getValue());
         double arcAngle = Math.round(portion.getValue() * getWideType().getValue() / getWideness());
-        double ratio = 2;
+        double ratio = ratioMin;
         if (portion == currentPortion) {
-            ratio = 1.9;
+            ratio = ratioMax;
         }
         arc.setFrame(
                 (width - width / ratio) / 2,
@@ -145,19 +149,19 @@ public class Camenbert implements ICamenbert {
         currentStartAngle += arcAngle;
         view.setColor(portion.getColor());
         view.fill(arc);
-        drawTitle(portion, view, arc, ratio);
+        drawTag(portion, view, arc);
         if (portion == currentPortion) {
-            drawTag(portion, view, arc, ratio);
+            drawTagContent(portion, view, arc);
         }
         return arc;
     }
 
-    private void drawTitle(IPortion portion, Graphics2D view, Arc2D arc, double ratio) {
-        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent(), ratio);
+    private void drawTag(IPortion portion, Graphics2D view, Arc2D arc) {
+        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent());
         double tagX = position.get(0);
         double tagY = position.get(1);
         Rectangle2D.Double tag = new Rectangle2D.Double();
-        tag.setFrame(tagX, tagY, width / 3 / ratio, height / 6 / ratio);
+        tag.setFrame(tagX, tagY, width / 3 / ratioMin, height / 6 / ratioMin);
         view.setColor(portion.getColor());
         view.fill(tag);
         view.setColor(new Color(255, 255, 255));
@@ -166,12 +170,12 @@ public class Camenbert implements ICamenbert {
         view.drawString(portion.getTitle() + " " + Double.toString(portion.getValue()) + " €", (float) tagX, (float) tagY);
     }
 
-    private void drawTag(IPortion portion, Graphics2D view, Arc2D arc, double ratio) {
-        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent(), ratio);
+    private void drawTagContent(IPortion portion, Graphics2D view, Arc2D arc) {
+        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent());
         double tagX = position.get(0);
         double tagY = position.get(1);
         Rectangle2D.Double tag = new Rectangle2D.Double();
-        tag.setFrame(tagX, tagY, width / 3 / ratio, height / 6 / ratio);
+        tag.setFrame(tagX, tagY, width / 3 / ratioMin, height / 6 / ratioMin);
         view.setColor(portion.getColor());
         view.fill(tag);
         view.setColor(new Color(255, 255, 255));
@@ -180,13 +184,20 @@ public class Camenbert implements ICamenbert {
         view.drawString(String.format(portion.getContent()), (float)tagX, (float)tagY);
     }
 
-    private void drawHole(IView view) {
-        view.getG2d().setColor(new Color(255, 255, 255));
+    private void drawHole(Graphics2D view) {
+        view.setColor(new Color(255, 255, 255));
         Ellipse2D.Double cercle = new Ellipse2D.Double(width/5.0*2.0, height/5.0*2.0, width/5.0, height/5.0);
-        view.getG2d().fill(cercle);
-        view.getG2d().setColor(new Color(55, 55, 50));
+        view.fill(cercle);
+        view.setColor(new Color(55, 55, 50));
         Ellipse2D.Double cercleData = new Ellipse2D.Double(width/6.0*2.5, height/6.0*2.5, width/6.0, height/6.0);
-        view.getG2d().fill(cercleData);
+        view.fill(cercleData);
+        float propWidth = (float)((width / ratioMin) - (width / 16));
+        float propHeight = (float)((height / ratioMin) - (height / 80));
+        view.setColor(new Color(255, 255, 255));
+        Font font = new Font(" Verdana ",Font.BOLD, 9);
+        view.setFont(font);
+        view.drawString("Mon camenbert", propWidth, propHeight);
+        view.drawString(Double.toString(getWideness()) + " €", propWidth, propHeight + 11);
     }
 
     @Override

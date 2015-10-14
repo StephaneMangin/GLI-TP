@@ -29,7 +29,7 @@ public class View extends JComponent implements IView
 		modelAdaptor = im;
 		controller = ic;
         this.sections = new HashMap<>();
-        camenbert = new Camenbert(WideType.Degree);
+        camenbert = new Camenbert(WideType.Degree, 2.0, 1.9);
         for (IItem item: modelAdaptor.getItems()) {
             camenbert.addPortion(item.getValue(), item.getTitle(), item.getDesc());
         }
