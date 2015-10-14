@@ -1,7 +1,7 @@
 package org.istic.gli.adaptors;
 
-import org.istic.gli.interfaces.IItem;
-import org.istic.gli.interfaces.IModel;
+import org.istic.gli.interfaces.model.IItem;
+import org.istic.gli.interfaces.model.IModel;
 import org.istic.gli.models.Model;
 
 import java.util.List;
@@ -10,26 +10,24 @@ import java.util.Observable;
 /**
  * Created by stephane on 22/09/15.
  */
-public class ModelAdaptor extends Observable implements IModel {
+public class ModelAdaptor extends Observable {
 
     private Model model;
+    private IItem currentItem;
 
     public ModelAdaptor(Model model) {
         this.model  = model;
     }
 
-    @Override
     public String getTitle() {
          return model.getTitle();
     }
 
-    @Override
     public void setTitle(String title) {
         model.setTitle(title);
         notifyObservers();
     }
 
-    @Override
     public List<IItem> getItems() {
         return model.getItems();
     }
@@ -42,6 +40,18 @@ public class ModelAdaptor extends Observable implements IModel {
     public void delItem(IItem item) {
         model.delItem(item);
         notifyObservers();
+    }
+
+    public void setCurrentItem(String title) {
+        for(IItem item: model.getItems()) {
+            if (item.getTitle() == title) {
+                model.setCurrentItem(item);
+            }
+        }
+    }
+
+    public IItem getCurrentItem() {
+        return model.getCurrentItem();
     }
 
 }

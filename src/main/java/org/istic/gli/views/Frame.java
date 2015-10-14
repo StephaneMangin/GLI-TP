@@ -1,6 +1,6 @@
 package org.istic.gli.views;
 
-import org.istic.gli.interfaces.IView;
+import org.istic.gli.interfaces.view.IView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +21,7 @@ public class Frame extends JFrame {
         this.getContentPane().add((JComponent) view);
 
         //Display the window.
-        this.setMinimumSize(new Dimension(200, 200));
+        this.setMinimumSize(new Dimension(600, 600));
         this.setSize(600, 600);
         this.pack();
     }

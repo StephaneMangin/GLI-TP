@@ -1,4 +1,6 @@
-package org.istic.gli.interfaces;
+package org.istic.gli.interfaces.controller;
+
+import org.istic.gli.interfaces.model.IItem;
 
 /**
  * Created by stephane on 22/09/15.

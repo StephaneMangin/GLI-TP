@@ -1,8 +1,8 @@
 package org.istic.gli.models;
 
 
-import org.istic.gli.interfaces.IItem;
-import org.istic.gli.interfaces.IModel;
+import org.istic.gli.interfaces.model.IItem;
+import org.istic.gli.interfaces.model.IModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ public class Model implements IModel {
     private String title;
 
     private List<IItem> items = new ArrayList<>();
+    private IItem currentItem;
 
     public Model(String title) {
         this.title = title;
@@ -37,6 +38,14 @@ public class Model implements IModel {
 
     public void delItem(IItem item) {
         this.items.remove(item);
+    }
+
+    public IItem getCurrentItem() {
+        return this.currentItem;
+    }
+
+    public void setCurrentItem(IItem item) {
+        this.currentItem = item;
     }
 }
 

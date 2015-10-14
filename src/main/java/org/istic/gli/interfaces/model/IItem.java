@@ -1,4 +1,4 @@
-package org.istic.gli.interfaces;
+package org.istic.gli.interfaces.model;
 
 /**
  * Created by lucas on 22/09/15.

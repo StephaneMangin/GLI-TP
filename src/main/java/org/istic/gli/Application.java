@@ -3,10 +3,9 @@ package org.istic.gli;
 import au.com.bytecode.opencsv.CSVReader;
 import org.istic.gli.adaptors.ModelAdaptor;
 import org.istic.gli.controllers.*;
-import org.istic.gli.interfaces.IController;
+import org.istic.gli.interfaces.controller.IController;
 import org.istic.gli.models.*;
 import org.istic.gli.views.*;
-import org.istic.gli.views.Frame;
 
 import javax.swing.*;
 import java.io.*;
@@ -17,6 +16,7 @@ import java.util.logging.Logger;
  */
 public class Application {
 
+    private static Frame frame;
     private static View view;
     private static String title = "Mon camenbert";
     private static Logger log = Logger.getLogger("Application");
@@ -45,7 +45,9 @@ public class Application {
         ModelAdaptor adaptor = new ModelAdaptor(model);
         IController controller = new Controller(model);
         // And link with view
-        view = new View(adaptor, controller, 600, 600);
+        view = new View(adaptor, controller);
+        frame = new Frame(adaptor.getTitle(), view);
+        frame.setVisible(true);
     }
 
     /**
