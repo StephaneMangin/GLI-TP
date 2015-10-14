@@ -48,6 +48,7 @@ public class Application {
         view = new View(adaptor, controller);
         frame = new Frame(adaptor.getTitle(), view);
         frame.setVisible(true);
+        frame.setResizable(false);
     }
 
     /**
