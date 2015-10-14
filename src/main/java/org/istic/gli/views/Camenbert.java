@@ -112,18 +112,20 @@ public class Camenbert implements ICamenbert {
         }
     }
 
-    private List<Double> getTagPosition(double startAngle, double arcAngle) {
+    private List<Double> getTagPosition(double startAngle, double arcAngle, double poswidth, double posheight) {
+        double relativeWidth = width/ratioMin;
+        double relativeHeight = height/ratioMin;
         List<Double> result = new ArrayList<>();
-        double tagX = width/ratioMin + (width/(ratioMin*2) * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
-        double tagY = height/ratioMin + (height/(ratioMin*2) * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagX = relativeWidth + (width/(ratioMin*1.5) * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagY = relativeHeight + (height/(ratioMin*1.5) * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
         //Placing nearest corner at the right position
-        if(tagX > width/ratioMin && tagY < height/ratioMin) {
-            tagY = tagY - width / ratioMin;
-        } else if (tagX < width/ratioMin && tagY > height/ratioMin) {
-            tagX = tagX - width / ratioMin;
-        } else if (tagX < width/ratioMin && tagY < height/ratioMin) {
-            tagX = tagX - width / ratioMin;
-            tagY = tagY - height / ratioMin;
+        if(tagX > relativeWidth && tagY < relativeHeight) {
+            tagY = tagY - posheight;
+        } else if (tagX < relativeWidth && tagY > relativeHeight) {
+            tagX = tagX - poswidth;
+        } else if (tagX < relativeWidth && tagY < relativeHeight) {
+            tagX = tagX - poswidth;
+            tagY = tagY - posheight;
         }
         result.add(tagX);
         result.add(tagY);
@@ -144,7 +146,7 @@ public class Camenbert implements ICamenbert {
                 width / ratio,
                 height / ratio
         );
-        arc.setAngleExtent(arcAngle);
+        arc.setAngleExtent(arcAngle - 2);
         arc.setAngleStart(currentStartAngle);
         currentStartAngle += arcAngle;
         view.setColor(portion.getColor());
@@ -157,31 +159,35 @@ public class Camenbert implements ICamenbert {
     }
 
     private void drawTag(IPortion portion, Graphics2D view, Arc2D arc) {
-        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent());
+        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent(), width / 6, height / 20);
         double tagX = position.get(0);
         double tagY = position.get(1);
         Rectangle2D.Double tag = new Rectangle2D.Double();
-        tag.setFrame(tagX, tagY, width / 5 / ratioMin, height / 9 / ratioMin);
+        tag.setFrame(tagX, tagY, width / 6, height / 20);
         view.setColor(portion.getColor());
         view.fill(tag);
         view.setColor(new Color(255, 255, 255));
-        Font font = new Font(" Verdana ",Font.BOLD, 9);
+        Font font = new Font(" Verdana ", Font.BOLD, (int)(width / height) * 8);
         view.setFont(font);
-        view.drawString(portion.getTitle() + " " + Double.toString(portion.getValue()) + " €", (float) tagX, (float) tagY);
+        view.drawString(portion.getTitle() + " " + Double.toString(portion.getValue()) + " €", (float) tagX + 2, (float) tagY + 10);
     }
 
     private void drawTagContent(IPortion portion, Graphics2D view, Arc2D arc) {
-        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent());
+        List<Double> position = getTagPosition(arc.getAngleStart(), arc.getAngleExtent(), width / 6, height / 20);
         double tagX = position.get(0);
         double tagY = position.get(1);
+        view.setColor(new Color(0, 0, 0));
+        Font font = new Font(" Verdana ", Font.BOLD, (int)(width / height) * 15);
+        view.setFont(font);
+        view.drawString(Math.round(portion.getValue() * 10000 / getWideness()) / 100.0 + "%", (float)tagX + 5, (float)tagY - 8);
         Rectangle2D.Double tag = new Rectangle2D.Double();
-        tag.setFrame(tagX, tagY, width / 5 / ratioMin, height / 8 / ratioMin);
+        tag.setFrame(tagX, tagY + 15 , width / 6, height / 20);
         view.setColor(portion.getColor());
         view.fill(tag);
         view.setColor(new Color(255, 255, 255));
-        Font font = new Font(" Verdana ",Font.BOLD, 9);
+        font = new Font(" Verdana ",Font.BOLD, (int)(width / height) * 8);
         view.setFont(font);
-        view.drawString(String.format(portion.getContent()), (float)tagX, (float)tagY);
+        view.drawString(String.format(portion.getContent()), (float)tagX + 2, (float)tagY + (float)(width / 20));
     }
 
     private void drawHole(Graphics2D view) {

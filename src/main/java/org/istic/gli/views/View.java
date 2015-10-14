@@ -19,16 +19,12 @@ public class View extends JComponent implements IView
 {
 
 	private ModelAdaptor modelAdaptor;
-	private IController controller;
     private ICamenbert camenbert;
-    private Map<Portion, IItem> sections;
     private Graphics2D g2d;
 
     public View(ModelAdaptor im, IController ic) {
         super();
 		modelAdaptor = im;
-		controller = ic;
-        this.sections = new HashMap<>();
         camenbert = new Camenbert(WideType.Degree, 2.0, 1.9);
         for (IItem item: modelAdaptor.getItems()) {
             camenbert.addPortion(item.getValue(), item.getTitle(), item.getDesc());
@@ -45,6 +41,7 @@ public class View extends JComponent implements IView
                         // TODO : Save item in controller
                         // TODO : screen it
                         camenbert.setCurrentPortion(portion);
+                        modelAdaptor.setCurrentItem(portion.getTitle());
                         repaint();
                     }
                 }

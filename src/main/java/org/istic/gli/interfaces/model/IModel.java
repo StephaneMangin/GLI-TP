@@ -12,4 +12,6 @@ public interface IModel {
     List<IItem> getItems();
     void addItem(IItem item);
     void delItem(IItem item);
+    void setCurrentItem(IItem item);
+    IItem getCurrentItem();
 }
