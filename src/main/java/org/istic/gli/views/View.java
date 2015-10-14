@@ -23,6 +23,7 @@ public class View extends JComponent implements IView
 	private Graphics2D g2;
 	private ModelAdaptor modelAdaptor;
 	private IController controller;
+    private double currentTotal;
 
     Map<Arc2D, IItem> sections;
 	
@@ -30,6 +31,7 @@ public class View extends JComponent implements IView
 		modelAdaptor = im;
 		controller = ic;
         sections = new HashMap<>();
+        currentTotal = 0;
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent mouseEvent) {
@@ -63,6 +65,7 @@ public class View extends JComponent implements IView
         List<IItem> items = modelAdaptor.getItems();
 		drawPie(items);
         drawHole(5.0, 1.3);
+        drawTitle(8.0);
 	}
 
 	private void drawPie(List<IItem> items) {
@@ -73,6 +76,7 @@ public class View extends JComponent implements IView
         for (IItem item : items) {
             total += item.getValue();
         }
+        this.currentTotal = total;
 		double curValue = 0.0;
         double width = getBounds().getWidth();
         double height = getBounds().getHeight();
@@ -111,6 +115,17 @@ public class View extends JComponent implements IView
 
 	}
 
+    private void drawTitle(double proportion) {
+        double width = getBounds().getWidth();
+        double height = getBounds().getHeight();
+        double propWidth = width/proportion;
+        g2.setColor(new Color(255, 255, 255));
+        Font font = new Font(" Verdana ",Font.BOLD, 9);
+        g2.setFont(font);
+        g2.drawString(this.modelAdaptor.getTitle(), (float)(width - propWidth) / 2, (float)(height / 2) - 11);
+        g2.drawString(Double.toString(this.currentTotal) + " €", (float)(width - propWidth) / 2, (float)(height / 2)  + 11);
+    }
+
     private void drawHole(double proportion, double inside) {
         double width = getBounds().getWidth();
         double height = getBounds().getHeight();
@@ -128,6 +143,7 @@ public class View extends JComponent implements IView
             Ellipse2D.Double cercleData = new Ellipse2D.Double((width - propWidth) / 2, (height - propHeight) / 2, propWidth, propHeight);
             g2.fill(cercleData);
         }
+
     }
 
     private List<Double> getTagPosition(double startAngle, double arcAngle, double width, double height) {
