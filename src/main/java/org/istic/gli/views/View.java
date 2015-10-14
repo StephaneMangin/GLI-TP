@@ -25,7 +25,9 @@ public class View extends JComponent implements IView
 	private IController controller;
     private double currentTotal;
 
-    Map<Arc2D, IItem> sections;
+    Map<Section, IItem> sections;
+
+
 	
 	public View(ModelAdaptor im, IController ic, int width, int height) {
 		modelAdaptor = im;
@@ -39,12 +41,12 @@ public class View extends JComponent implements IView
                 System.out.println("mouseClicked");
                 int posX = mouseEvent.getX();
                 int posY = mouseEvent.getY();
-                for (Arc2D arc : sections.keySet()) {
-                    if (arc.contains(posX, posY)) {
+                for (Section section : sections.keySet()) {
+                    if (section.getArc().contains(posX, posY)) {
                         // TODO : increase the radius
                         // TODO : Save item in controller
                         // TODO : screen it
-                        IItem item = sections.get(arc);
+                        IItem item = sections.get(section);
                         controller.setCurrentItem(item);
                         repaint();
                     }
@@ -91,7 +93,7 @@ public class View extends JComponent implements IView
             double currentWidth = width / 2.5;
             double currentHeight = height / 2.5;
             List<Double> position = getTagPosition(startAngle, arcAngle, width / 4, height / 20);
-            drawTag(position, width / 4, height / 20, item.getTitle() + " " + item.getValue() + " €", color);
+            Rectangle2D tag = drawTag(position, width / 4, height / 20, item.getTitle() + " " + item.getValue() + " €", color);
             // If selected, increase slightly the radius
             if (item.equals(controller.getCurrentItem())) {
                 currentWidth = width / 2.3;
@@ -105,7 +107,7 @@ public class View extends JComponent implements IView
             arc.setFrame(x, y, currentWidth, currentHeight);
             arc.setAngleStart(startAngle);
             arc.setAngleExtent(arcAngle);
-            sections.put(arc, item);
+            sections.put(new Section(arc, tag), item);
 
             //Draw the arc with new color:
             g2.setColor(color);
@@ -165,7 +167,7 @@ public class View extends JComponent implements IView
         return result;
     }
 
-    private void drawTag(List<Double> position, double width, double height, String title, Color color) {
+    private Rectangle2D drawTag(List<Double> position, double width, double height, String title, Color color) {
         double tagX = position.get(0);
         double tagY = position.get(1);
         Rectangle2D.Double tag = new Rectangle2D.Double();
@@ -176,6 +178,7 @@ public class View extends JComponent implements IView
         Font font = new Font(" Verdana ",Font.BOLD, 9);
         g2.setFont(font);
         g2.drawString(String.format(title), (float) (tagX + 1), (float) (tagY + height * 0.6));
+        return tag;
     }
 
     @Override
@@ -183,5 +186,30 @@ public class View extends JComponent implements IView
         // mise à jour du camenbert
         System.out.println("update view");
         repaint();
+    }
+
+    private class Section {
+        private Arc2D arc;
+        private Rectangle2D tag;
+        public Section(Arc2D arc, Rectangle2D tag) {
+            this.arc = arc;
+            this.tag = tag;
+        }
+
+        public Arc2D getArc() {
+            return arc;
+        }
+
+        public void setArc(Arc2D arc) {
+            this.arc = arc;
+        }
+
+        public Rectangle2D getTag() {
+            return tag;
+        }
+
+        public void setTag(Rectangle2D tag) {
+            this.tag = tag;
+        }
     }
 }
