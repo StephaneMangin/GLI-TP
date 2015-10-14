@@ -104,7 +104,7 @@ public class Camenbert implements ICamenbert {
         width = view.getWidth();
         height = view.getHeight();
         for (IPortion portion: portions.keySet()) {
-            Arc2D arc = drawArc(portion, view.getG2d());
+            drawArc(portion, view.getG2d());
         }
         if (this.hole) {
             //Draw a circle to make a hole in the pie
@@ -114,8 +114,8 @@ public class Camenbert implements ICamenbert {
 
     private List<Double> getTagPosition(double startAngle, double arcAngle) {
         List<Double> result = new ArrayList<>();
-        double tagX = width/ratioMin + (width/(ratioMin) * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
-        double tagY = height/ratioMin + (height/(ratioMin) * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagX = width/ratioMin + (width/(ratioMin*2) * Math.sin(Math.toRadians(startAngle+90+(arcAngle/2))));
+        double tagY = height/ratioMin + (height/(ratioMin*2) * Math.cos(Math.toRadians(startAngle+90+(arcAngle/2))));
         //Placing nearest corner at the right position
         if(tagX > width/ratioMin && tagY < height/ratioMin) {
             tagY = tagY - width / ratioMin;
@@ -161,7 +161,7 @@ public class Camenbert implements ICamenbert {
         double tagX = position.get(0);
         double tagY = position.get(1);
         Rectangle2D.Double tag = new Rectangle2D.Double();
-        tag.setFrame(tagX, tagY, width / 3 / ratioMin, height / 6 / ratioMin);
+        tag.setFrame(tagX, tagY, width / 5 / ratioMin, height / 9 / ratioMin);
         view.setColor(portion.getColor());
         view.fill(tag);
         view.setColor(new Color(255, 255, 255));
@@ -175,7 +175,7 @@ public class Camenbert implements ICamenbert {
         double tagX = position.get(0);
         double tagY = position.get(1);
         Rectangle2D.Double tag = new Rectangle2D.Double();
-        tag.setFrame(tagX, tagY, width / 3 / ratioMin, height / 6 / ratioMin);
+        tag.setFrame(tagX, tagY, width / 5 / ratioMin, height / 8 / ratioMin);
         view.setColor(portion.getColor());
         view.fill(tag);
         view.setColor(new Color(255, 255, 255));
@@ -194,7 +194,7 @@ public class Camenbert implements ICamenbert {
         float propWidth = (float)((width / ratioMin) - (width / 16));
         float propHeight = (float)((height / ratioMin) - (height / 80));
         view.setColor(new Color(255, 255, 255));
-        Font font = new Font(" Verdana ",Font.BOLD, 9);
+        Font font = new Font(" Verdana ",Font.BOLD, (int)(width / height) * 8);
         view.setFont(font);
         view.drawString("Mon camenbert", propWidth, propHeight);
         view.drawString(Double.toString(getWideness()) + " €", propWidth, propHeight + 11);
